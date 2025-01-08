@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.game.mapper.StaGameMapper">
+    
+    <resultMap type="StaGame" id="StaGameResult">
+        <result property="id"    column="id"    />
+        <result property="homeName"    column="home_name"    />
+        <result property="awayName"    column="away_name"    />
+        <result property="gameType"    column="game_type"    />
+        <result property="homeid"    column="homeid"    />
+        <result property="awayid"    column="awayid"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="hteamScore"    column="hteam_score"    />
+        <result property="vteamScore"    column="vteam_score"    />
+        <result property="playingTime"    column="playing_time"    />
+        <result property="leagueId"    column="league_id"    />
+        <result property="gameRound"    column="game_round"    />
+        <result property="gameAddrId"    column="game_addr"    />
+        <result property="venueName"    column="venue_name"    />
+        <result property="gameStatus"    column="game_status"    />
+        <result property="gameStage"    column="game_stage"    />
+        <result property="homeColor"    column="home_color"    />
+        <result property="awayColor"    column="away_color"    />
+        <result property="homePaused"    column="home_paused"    />
+        <result property="awayPaused"    column="away_paused"    />
+        <result property="homeFouls"    column="home_fouls"    />
+        <result property="awayFouls"    column="away_fouls"    />
+        <result property="homeTeamLogo"    column="home_team_logo"    />
+        <result property="awayTeamLogo"    column="away_team_logo"    />
+        <result property="hsessionsScore"    column="hsessions_score"    />
+        <result property="asessionsScore"    column="asessions_score"    />
+        <result property="leagueName"    column="league_name"    />
+        <result property="leagueLogoPath"    column="league_logo_path"    />
+    </resultMap>
+
+    <sql id="selectStaGameVo">
+        select id, home_name, away_name, homeid, awayid, game_round, game_addr, venue_name, game_status, game_stage, create_by, create_time, update_by, update_time,
+        hteam_score, vteam_score, playing_time, league_id, game_type,home_paused,away_paused,home_color,away_color,home_fouls,away_fouls,hsessions_score,asessions_score
+        from sta_game
+    </sql>
+
+    <select id="selectStaGameList" parameterType="StaGame" resultMap="StaGameResult">
+        SELECT
+        g.id,
+        tm_home.team_logo AS home_team_logo,
+        tm_away.team_logo AS away_team_logo,
+        g.home_name,
+        g.away_name,
+        g.homeid,
+        g.awayid,
+        g.game_round,
+        g.game_addr,
+        g.venue_name,
+        g.game_status,
+        g.game_stage,
+        g.create_by,
+        g.create_time,
+        g.update_by,
+        g.update_time,
+        g.hteam_score,
+        g.vteam_score,
+        g.playing_time,
+        g.league_id,
+        g.game_type,
+        g.home_paused,
+        g.away_paused,
+        g.home_color,
+        g.away_color,
+        g.home_fouls,
+        g.away_fouls,
+        lm.league_name,
+        lm.league_logo
+        FROM
+        sta_game g
+        LEFT JOIN sta_team tm_home ON tm_home.id = g.homeid
+        LEFT JOIN sta_team tm_away ON tm_away.id = g.awayid
+        LEFT JOIN sta_league_match lm ON lm.id = g.league_id
+        <where>
+            <if test="homeName != null  and homeName != ''"> and g.home_name like concat('%', #{homeName}, '%')</if>
+            <if test="awayName != null  and awayName != ''"> and g.away_name like concat('%', #{awayName}, '%')</if>
+            <if test="homeid != null "> and g.homeid = #{homeid}</if>
+            <if test="awayid != null "> and g.awayid = #{awayid}</if>
+            <if test="leagueId != null "> and g.league_id = #{leagueId}</if>
+            <choose>
+                <when test="gameStatus == 0">
+                    and g.game_status between 0 and 12
+                </when>
+                <when test="gameStatus == 1">
+                    and g.game_status = 0
+                </when>
+                <when test="gameStatus == 2">
+                    and g.game_status between 1 and 12
+                </when>
+                <when test="gameStatus == 3">
+                    and g.game_status = 13
+                </when>
+            </choose>
+        </where>
+        order by playing_time desc
+    </select>
+
+
+    <select id="selectStaGameById" parameterType="Long" resultMap="StaGameResult">
+        <include refid="selectStaGameVo"/>
+        where id = #{compeid}
+    </select>
+
+    <insert id="insertStaGame" parameterType="StaGame" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into sta_game
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="homeName != null">home_name,</if>
+            <if test="awayName != null">away_name,</if>
+            <if test="homeid != null">homeid,</if>
+            <if test="awayid != null">awayid,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="hteamScore != null">hteam_score,</if>
+            <if test="vteamScore != null">vteam_score,</if>
+            <if test="playingTime != null">playing_time,</if>
+            <if test="leagueId != null">league_id,</if>
+            <if test="gameType != null">game_type,</if>
+            <if test="gameRound != null">game_round,</if>
+            <if test="gameAddrId != null">game_addr,</if>
+            <if test="venueName != null">venue_name,</if>
+            <if test="gameStatus != null">game_status,</if>
+            <if test="gameStage != null">game_stage,</if>
+            <if test="homeColor != null">home_color,</if>
+            <if test="awayColor != null">away_color,</if>
+            <if test="homePaused != null">home_paused,</if>
+            <if test="awayPaused != null">away_paused,</if>
+            <if test="homeFouls != null">home_fouls,</if>
+            <if test="awayFouls != null">away_fouls,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="homeName != null">#{homeName},</if>
+            <if test="awayName != null">#{awayName},</if>
+            <if test="homeid != null">#{homeid},</if>
+            <if test="awayid != null">#{awayid},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="hteamScore != null">#{hteamScore},</if>
+            <if test="vteamScore != null">#{vteamScore},</if>
+            <if test="playingTime != null">#{playingTime},</if>
+            <if test="leagueId != null">#{leagueId},</if>
+            <if test="gameType != null">#{gameType},</if>
+            <if test="gameRound != null">#{gameRound},</if>
+            <if test="gameAddrId != null">#{gameAddrId},</if>
+            <if test="venueName != null">#{venueName},</if>
+            <if test="gameStatus != null">#{gameStatus},</if>
+            <if test="gameStage != null">#{gameStage},</if>
+            <if test="homeColor != null">#{homeColor},</if>
+            <if test="awayColor != null">#{awayColor},</if>
+            <if test="homePaused != null">#{homePaused},</if>
+            <if test="awayPaused != null">#{awayPaused},</if>
+            <if test="homeFouls != null">#{homeFouls},</if>
+            <if test="awayFouls != null">#{awayFouls},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStaGame" parameterType="StaGame" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        update sta_game
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="homeName != null">home_name = #{homeName},</if>
+            <if test="awayName != null">away_name = #{awayName},</if>
+            <if test="homeid != null">homeid = #{homeid},</if>
+            <if test="awayid != null">awayid = #{awayid},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="hteamScore != null">hteam_score = #{hteamScore},</if>
+            <if test="vteamScore != null">vteam_score = #{vteamScore},</if>
+            <if test="playingTime != null">playing_time = #{playingTime},</if>
+            <if test="leagueId != null">league_id = #{leagueId},</if>
+            <if test="gameType != null">game_type = #{gameType},</if>
+            <if test="gameRound != null">game_round = #{gameRound},</if>
+            <if test="gameAddrId != null">game_addr = #{gameAddrId},</if>
+            <if test="venueName != null">venue_name = #{venueName},</if>
+            <if test="gameStatus != null">game_status = #{gameStatus},</if>
+            <if test="gameStage != null">game_stage = #{gameStage},</if>
+            <if test="homeColor != null">home_color = #{homeColor},</if>
+            <if test="awayColor != null">away_color = #{awayColor},</if>
+            <if test="homePaused != null">home_paused = #{homePaused},</if>
+            <if test="awayPaused != null">away_paused = #{awayPaused},</if>
+            <if test="homeFouls != null">home_fouls = #{homeFouls},</if>
+            <if test="awayFouls != null">away_fouls = #{awayFouls},</if>
+            <if test="hsessionsScore != null">hsessions_score = #{hsessionsScore},</if>
+            <if test="asessionsScore != null">asessions_score = #{asessionsScore},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateScoreById" parameterType="StaGame">
+        update sta_game g
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="hteamScore != null"> g.hteam_score = g.hteam_score + #{hteamScore},</if>
+            <if test="vteamScore != null"> g.vteam_score = g.vteam_score + #{vteamScore},</if>
+            <if test="homePaused != null"> g.home_paused = g.home_paused + #{homePaused},</if>
+            <if test="awayPaused != null"> g.away_paused = g.away_paused + #{awayPaused},</if>
+            <if test="homeFouls != null"> g.home_fouls = g.home_fouls + #{homeFouls},</if>
+            <if test="awayFouls != null"> g.away_fouls = g.away_fouls + #{awayFouls},</if>
+        </trim>
+        <where>
+            <if test="id != null"> and g.id = #{id}</if>
+<!--            <if test="homeid != null"> and homeid = #{homeid}</if>-->
+<!--            <if test="awayid != null"> and awayid = #{awayid}</if>-->
+        </where>
+    </update>
+
+
+    <delete id="deleteStaGameById" parameterType="Long">
+        delete from sta_game where id = #{id}
+    </delete>
+
+    <delete id="deleteStaGameByIds" parameterType="String">
+        delete from sta_game where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

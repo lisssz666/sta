@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.sponsor.mapper.StaSponsorMapper">
+
+    <!-- 查询所有赞助商信息 -->
+    <select id="selectAllSponsors" resultType="com.ruoyi.project.sponsor.domain.StaSponsor">
+        SELECT id, title, type, icon, click_effect
+        FROM sta_sponsor;
+    </select>
+
+    <!-- 根据ID查询赞助商 -->
+    <select id="selectSponsorById" parameterType="Long" resultType="com.ruoyi.project.sponsor.domain.StaSponsor">
+        SELECT id, title, type, icon, click_effect
+        FROM sta_sponsor
+        WHERE id = #{id};
+    </select>
+
+    <!-- 插入新的赞助商信息 -->
+    <insert id="insertSponsor" parameterType="StaSponsor" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sta_sponsor (title, type, icon, click_effect)
+        VALUES (#{title}, #{type}, #{icon}, #{clickEffect});
+    </insert>
+
+    <!-- 根据ID更新赞助商信息 -->
+    <update id="updateSponsorById" parameterType="StaSponsor">
+        UPDATE sta_sponsor
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="clickEffect != null">click_effect = #{clickEffect},</if>
+        </set>
+        WHERE id = #{id};
+    </update>
+
+    <!-- 根据ID删除赞助商 -->
+    <delete id="deleteSponsorById" parameterType="Long">
+        DELETE FROM sta_sponsor WHERE id = #{id};
+    </delete>
+
+</mapper>

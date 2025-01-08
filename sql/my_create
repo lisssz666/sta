@@ -1,0 +1,280 @@
+
+/*fba数据去重*/
+delete from ffc_fba_warehouse where id not in (SELECT a.id  FROM(select max(id) as id from ffc_fba_warehouse group by company,companyCode,country,province,city,address,postal_code,
+moduleType,remote) as a);
+
+/*fba数据去重,companyCode不能重复*/
+delete from ffc_fba_warehouse where id not in (
+SELECT a.id  FROM(select max(id) as id from ffc_fba_warehouse
+group by companyCode) as a
+);
+
+
+-- 向sys_user中添加字段
+ALTER TABLE sys_user ADD COLUMN vip_day_remaining datetime(0) DEFAULT NULL COMMENT '会员充值时间';
+
+drop table if exists sta_league_match;
+CREATE TABLE sta_league_match (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',
+    league_name VARCHAR(255) NOT NULL COMMENT '联赛名称',
+    league_logo VARCHAR(255) COMMENT '联赛Logo',
+    league_nature VARCHAR(255) COMMENT '联赛性质',
+    enroll_team INT COMMENT '报名队伍数',
+    host VARCHAR(255) COMMENT '主办方',
+    organizer VARCHAR(255) COMMENT '承办方',
+    co_organizer VARCHAR(255) COMMENT '协办方',
+    sponsor VARCHAR(255) COMMENT '赞助商',
+    title_sponsor VARCHAR(255) COMMENT '冠名赞助商',
+    notes TEXT COMMENT '备注',
+    location VARCHAR(255) COMMENT '举办地点',
+    league_status INT COMMENT '联赛状态',
+    enroll_starttime DATETIME COMMENT '报名开始时间',
+    enroll_endtime DATETIME COMMENT '报名结束时间',
+    game_starttime DATETIME COMMENT '比赛开始时间',
+    game_endtime DATETIME COMMENT '比赛结束时间',
+    contact_person VARCHAR(255) COMMENT '赛事联系人',
+    contact_phone VARCHAR(20) COMMENT '赛事联系人电话',
+    background_image VARCHAR(255) COMMENT '赛事背景图',
+    venue VARCHAR(255) COMMENT '比赛场地',
+    create_by VARCHAR(64) COMMENT '创建人',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(64) COMMENT '更新人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT '联赛表';
+
+INSERT INTO sta_league_match (league_name, league_logo, league_nature, enroll_team, host, organizer, co_organizer, sponsor, title_sponsor, notes, location, league_status, enroll_starttime, enroll_endtime, game_starttime, game_endtime, contact_person, contact_phone, background_image, venue, create_by)
+VALUES
+('超级篮球联赛', 'logo1.png', '职业', 12, '某某主办方', '某某承办方', '某某协办方', '某某赞助商', '某某冠名赞助商', '备注内容1', '北京体育馆', 1, '2024-09-01 09:00:00', '2024-09-15 18:00:00', '2024-09-20 14:00:00', '2024-09-25 18:00:00', '张三', '13800138000', 'background1.jpg', '北京体育馆', 'admin'),
+('全国篮球邀请赛', 'logo2.png', '业余', 8, '某某主办方2', '某某承办方2', '某某协办方2', '某某赞助商2', '某某冠名赞助商2', '备注内容2', '上海体育馆', 0, '2024-09-05 10:00:00', '2024-09-10 18:00:00', '2024-09-16 15:00:00', '2024-09-22 19:00:00', '李四', '13800138001', 'background2.jpg', '上海体育馆', 'admin'),
+('城市篮球联赛', 'logo3.png', '业余', 16, '某某主办方3', '某某承办方3', '某某协办方3', '某某赞助商3', '某某冠名赞助商3', '备注内容3', '广州体育馆', 1, '2024-08-20 08:00:00', '2024-09-10 20:00:00', '2024-09-12 14:00:00', '2024-09-18 18:00:00', '王五', '13800138002', 'background3.jpg', '广州体育馆', 'admin'),
+('国际篮球挑战赛', 'logo4.png', '国际', 20, '某某主办方4', '某某承办方4', '某某协办方4', '某某赞助商4', '某某冠名赞助商4', '备注内容4', '深圳体育馆', 2, '2024-09-02 12:00:00', '2024-09-12 17:00:00', '2024-09-15 12:00:00', '2024-09-20 16:00:00', '赵六', '13800138003', 'background4.jpg', '深圳体育馆', 'admin'),
+('区域篮球对抗赛', 'logo5.png', '区域', 10, '某某主办方5', '某某承办方5', '某某协办方5', '某某赞助商5', '某某冠名赞助商5', '备注内容5', '杭州体育馆', 0, '2024-09-03 09:00:00', '2024-09-08 18:00:00', '2024-09-13 13:00:00', '2024-09-19 18:00:00', '孙七', '13800138004', 'background5.jpg', '杭州体育馆', 'admin'),
+('青年篮球联赛', 'logo6.png', '青年', 6, '某某主办方6', '某某承办方6', '某某协办方6', '某某赞助商6', '某某冠名赞助商6', '备注内容6', '武汉体育馆', 1, '2024-09-04 08:00:00', '2024-09-14 18:00:00', '2024-09-18 12:00:00', '2024-09-25 17:00:00', '周八', '13800138005', 'background6.jpg', '武汉体育馆', 'admin');
+
+
+
+
+drop table if exists sta_game;
+CREATE TABLE sta_game (
+    id BIGINT AUTO_INCREMENT COMMENT 'id',
+    home_name VARCHAR(255) COMMENT '主队名称',
+    away_name VARCHAR(255) COMMENT '客队名称',
+    game_type VARCHAR(255) COMMENT '比赛类型',
+    homeid BIGINT COMMENT '主队id',
+    awayid BIGINT COMMENT '客队id',
+    hteam_score INT COMMENT '主队分数',
+    vteam_score INT COMMENT '客队分数',
+    league_id INT COMMENT '联赛id',
+    playing_time DATETIME COMMENT '比赛时间',
+    game_round VARCHAR(255) COMMENT '比赛轮次',
+    game_addr INT COMMENT '比赛场地id',
+    game_status INT default 0 COMMENT '比赛状态0未开始，1进行中，2已结束',
+    game_stage VARCHAR(50) COMMENT '比赛阶段',
+    venue_name VARCHAR(255) COMMENT '比赛场地',
+    create_by   varchar(64)     default '' comment '创建者',
+    create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+    update_by  varchar(64)     default ''  comment '更新者',
+    update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间',
+    primary key (id)
+) COMMENT='比赛信息表';
+
+ALTER TABLE sta_game
+ADD COLUMN home_color VARCHAR(255),
+ADD COLUMN away_color VARCHAR(255),
+ADD COLUMN home_paused INT,
+ADD COLUMN away_paused INT,
+ADD COLUMN home_fouls INT,
+ADD COLUMN away_fouls INT,
+ADD COLUMN hsessions_score VARCHAR(255),
+ADD COLUMN asessions_score VARCHAR(255);
+
+
+
+
+
+drop table if exists sta_team;
+CREATE TABLE sta_team (
+    id BIGINT AUTO_INCREMENT COMMENT 'id',
+    team_title VARCHAR(255) COMMENT '球队名称',
+		team_logo VARCHAR(255) COMMENT '球队logo',
+		leader_name VARCHAR(255) COMMENT '领队',
+		leader_phone VARCHAR(255) COMMENT '领队电话',
+		city VARCHAR(255) COMMENT '所属城市',
+		home_color VARCHAR(255) COMMENT '主场颜色',
+		away_color VARCHAR(255) COMMENT '客场颜色',
+		create_by   varchar(64)     default '' comment '创建者',
+		create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+		update_by  varchar(64)     default ''  comment '更新者',
+		update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间',
+		primary key (id)
+) COMMENT='球队信息表';
+
+
+
+drop table if exists sta_player;
+CREATE TABLE sta_player (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '球员ID',
+    team_id BIGINT NOT NULL COMMENT '所属球队ID',
+    logo VARCHAR(255) COMMENT '球员logo',
+    name VARCHAR(50) NOT NULL COMMENT '球员姓名',
+    jersey_number INT COMMENT '球衣号码',
+    weight DOUBLE COMMENT '体重 (kg)',
+    height DOUBLE COMMENT '身高 (cm)',
+    position VARCHAR(20) COMMENT '位置',
+    phone_number VARCHAR(20) COMMENT '手机号',
+    create_by VARCHAR(50) COMMENT '创建人',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(50) COMMENT '更新人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT='球员信息表';
+
+INSERT INTO sta_player (team_id, logo, name, jersey_number, weight, height, position, phone_number, create_by, create_time)
+VALUES
+    (1, 'logo1.png', '张三', 10, 85.5, 190.0, '前锋', '13800000001', 'admin', NOW()),
+    (1, 'logo2.png', '李四', 11, 78.0, 185.0, '中锋', '13800000002', 'admin', NOW()),
+    (2, 'logo3.png', '王五', 7, 90.0, 195.0, '后卫', '13800000003', 'admin', NOW()),
+    (2, 'logo4.png', '赵六', 8, 88.5, 192.0, '前锋', '13800000004', 'admin', NOW()),
+    (3, 'logo5.png', '孙七', 9, 82.0, 180.0, '中锋', '13800000005', 'admin', NOW()),
+    (3, 'logo6.png', '周八', 12, 75.0, 178.0, '后卫', '13800000006', 'admin', NOW());
+
+
+drop table if exists sta_player_statistic;
+CREATE TABLE sta_player_statistic (
+    id BIGINT AUTO_INCREMENT COMMENT 'id',
+    player_id BIGINT COMMENT '球员id',
+    compeid BIGINT COMMENT '比赛id',
+    score BIGINT COMMENT '得分',
+    backboard BIGINT COMMENT '篮板',
+    assist BIGINT COMMENT '助攻',
+    tackle BIGINT COMMENT '抢断',
+    cover BIGINT COMMENT '盖帽',
+    shoot_the_ball VARCHAR(255) COMMENT '两分球',
+    shoot VARCHAR(255) COMMENT '投篮',
+    trisection VARCHAR(255) COMMENT '三分球',
+    free_throw VARCHAR(255) COMMENT '罚球',
+    block_shot BIGINT COMMENT '快攻',
+    mistake BIGINT COMMENT '失误',
+    foul BIGINT COMMENT '犯规',
+    hit_rate VARCHAR(255) COMMENT '命中率',
+    team_id BIGINT COMMENT '球队id',
+    jersey_number INT COMMENT '球员号码',
+    name_num VARCHAR(255) COMMENT '球员姓名',
+    homeid BIGINT COMMENT '主队id',
+    awayid BIGINT COMMENT '客队id',
+    hteam_score INT COMMENT '主队分数',
+    vteam_score INT COMMENT '客队分数',
+    create_by   varchar(64)     default '' comment '创建者',
+    create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+    update_by  varchar(64)     default ''  comment '更新者',
+    update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间',
+    primary key (id)
+) COMMENT='数据统计表';
+
+drop table if exists sta_league_rule;
+CREATE TABLE sta_league_rule (
+    id BIGINT AUTO_INCREMENT COMMENT 'id',
+    leagueid BIGINT COMMENT '联赛id',
+    fmt VARCHAR(50) COMMENT '人制',
+    sys VARCHAR(50) COMMENT '赛制',
+    age_lim VARCHAR(50) COMMENT '年龄限制',
+    periods INT COMMENT '节数',
+    period_dur INT COMMENT '单节时长',
+    ot_dur INT COMMENT '加时赛单节时长',
+    rank_rules TEXT COMMENT '排名规则',
+    win_pts INT COMMENT '胜一场得分',
+    loss_pts INT COMMENT '负一场得分',
+    create_by   varchar(64)     default '' comment '创建者',
+    create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+    update_by  varchar(64)     default ''  comment '更新者',
+    update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间',
+    primary key (id)
+) COMMENT='赛事规则';
+
+
+drop table if exists sta_sponsor;
+CREATE TABLE sta_sponsor (
+    id BIGINT AUTO_INCREMENT  COMMENT '主键ID',
+    title VARCHAR(255) NOT NULL COMMENT '标题',
+    type VARCHAR(50) NOT NULL COMMENT '类型',
+    icon VARCHAR(255) COMMENT '图标路径',
+    click_effect VARCHAR(255) COMMENT '点击效果',
+		create_by   varchar(64)     default '' comment '创建者',
+		create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+		update_by  varchar(64)     default ''  comment '更新者',
+		update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间',
+		primary key (id)
+) COMMENT='赞助商管理表';
+
+
+-- 创建球队分组表
+drop table if exists sta_team_group;
+CREATE TABLE sta_team_group (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    league_id BIGINT NOT NULL COMMENT '联赛ID',
+    group_name VARCHAR(255) NOT NULL COMMENT '分组名称',
+    team_ids varchar(255) NOT NULL COMMENT '分组里的球队ID，使用JSON字段存储',
+		create_by   varchar(64)     default '' comment '创建者',
+		create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+		update_by  varchar(64)     default ''  comment '更新者',
+		update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间'
+) COMMENT '球队分组表';
+
+drop table if exists sta_team_ranking;
+CREATE TABLE sta_team_ranking (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
+    league_id BIGINT NOT NULL COMMENT '联赛ID',
+    team_name VARCHAR(255) NOT NULL COMMENT '球队名',
+    team_logo VARCHAR(255) COMMENT '球队logo',
+    score INT DEFAULT 0 COMMENT '得分',
+    conceded INT DEFAULT 0 COMMENT '失分',
+    wins INT DEFAULT 0 COMMENT '胜场',
+    losses INT DEFAULT 0 COMMENT '负场',
+    games_played INT DEFAULT 0 COMMENT '比赛场数',
+		create_by VARCHAR(64) COMMENT '创建人',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(64) COMMENT '更新人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT='球队榜';
+
+CREATE TABLE sta_player_ranking (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,    -- 自增ID，球员榜的唯一标识
+    league_id BIGINT NOT NULL,               -- 联赛ID，表示球员所属的联赛
+    player_name VARCHAR(100) NOT NULL,       -- 球员名字
+    score INT DEFAULT 0,                     -- 得分，球员在比赛中的总得分
+    fouls INT DEFAULT 0,                     -- 犯规次数，球员在比赛中的犯规次数
+    player_logo VARCHAR(255),                -- 球员Logo，球员图片URL
+    starter_count INT DEFAULT 0,             -- 首发次数，球员作为首发出场的次数
+    games_played INT DEFAULT 0 ,              -- 比赛场数，球员参与的比赛场数
+		create_by VARCHAR(64) COMMENT '创建人',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(64) COMMENT '更新人',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+)COMMENT='球员榜';;
+
+
+CREATE TABLE sta_enroll (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '自动增长的主键',
+    start_date DATETIME COMMENT '报名开始日期',
+    end_date DATETIME COMMENT '报名结束日期',
+    teams INT COMMENT '球队数量',
+    capacity INT COMMENT '人数限制',
+    contact VARCHAR(255) COMMENT '报名联系人',
+    phone VARCHAR(20) COMMENT '联系人电话',
+    email VARCHAR(100) COMMENT '联系人电子邮件',
+    instructions TEXT COMMENT '报名说明',
+    league_id INT NOT NULL COMMENT '联赛ID',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录最后更新时间'
+) COMMENT='报名信息表';
+
+drop table if exists sta_game_address;
+CREATE TABLE `sta_game_address` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+	`league_id` int(100)  COMMENT '联赛id',
+  `venue_name` varchar(255)  COMMENT '球馆名',
+  `location` varchar(255)  COMMENT '所在地',
+  `game_addr` varchar(255)  COMMENT '详细地址',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录最后更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='比赛信息表';

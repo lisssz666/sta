@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.statistic.mapper.StaPlayerStatisticMapper">
+    
+    <resultMap type="StaPlayerStatistic" id="StaPlayerStatisticResult">
+        <result property="id"    column="id"    />
+        <result property="nameNum"    column="name_num"    />
+        <result property="jerseyNumber"    column="jersey_number"    />
+        <result property="playerId"    column="player_id"    />
+        <result property="compeid"    column="compeid"    />
+        <result property="score"    column="score"    />
+        <result property="backboard"    column="backboard"    />
+        <result property="assist"    column="assist"    />
+        <result property="shootTheBall"    column="shoot_the_ball"    />
+        <result property="trisection"    column="trisection"    />
+        <result property="freeThrow"    column="free_throw"    />
+        <result property="tackle"    column="tackle"    />
+        <result property="blockShot"    column="block_shot"    />
+        <result property="mistake"    column="mistake"    />
+        <result property="foul"    column="foul"    />
+        <result property="shoot"    column="shoot"    />
+        <result property="cover"    column="cover"    />
+        <result property="hitRate"    column="hit_rate"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+
+        <!--<result property="nameNum"    column="name_num"    />
+        <result property="teamTitle"    column="team_title"    />-->
+    </resultMap>
+
+    <sql id="selectStaPlayerStatisticVo">
+        select id, player_id, compeid, score, backboard, assist, shoot_the_ball, trisection, free_throw, tackle, block_shot, mistake, foul,shoot,cover, hit_rate, create_by, create_time, update_by, update_time from sta_player_statistic
+    </sql>
+
+    <select id="selectStaPlayerStatisticList" resultMap="StaPlayerStatisticResult">
+        SELECT
+        s.id,
+        s.name_num,
+        s.jersey_number,
+        s.player_id,
+        s.compeid,
+        s.score,
+        s.backboard,
+        s.assist,
+        s.cover,
+        s.shoot,
+        s.shoot_the_ball,
+        s.trisection,
+        s.free_throw,
+        s.tackle,
+        s.block_shot,
+        s.mistake,
+        s.foul,
+        s.hit_rate,
+        s.create_by,
+        s.create_time,
+        s.update_by,
+        s.update_time
+        FROM sta_player_statistic s
+        <where>
+            <if test="compeid != null "> and s.compeid = #{compeid}</if>
+            <if test="homeid != null "> and s.team_id = #{homeid}</if>
+            <if test="awayid != null "> and s.team_id = #{awayid}</if>
+        </where>
+        UNION ALL
+        SELECT
+        NULL AS id,
+        '总计' AS name_num,
+        NULL AS jersey_number,
+        NULL AS player_id,
+        NULL AS compeid,
+        SUM(s.score) AS score,
+        SUM(s.backboard) AS backboard,
+        SUM(s.assist) AS assist,
+        SUM(s.cover) AS cover,
+        CONCAT(SUM(SUBSTRING_INDEX(s.shoot, '/', 1)), '/', SUM(SUBSTRING_INDEX(s.shoot, '/', -1))) AS shoot,
+        CONCAT(SUM(SUBSTRING_INDEX(s.shoot_the_ball, '/', 1)), '/', SUM(SUBSTRING_INDEX(s.shoot_the_ball, '/', -1))) AS shoot_the_ball,
+        CONCAT(SUM(SUBSTRING_INDEX(s.trisection, '/', 1)), '/', SUM(SUBSTRING_INDEX(s.trisection, '/', -1))) AS trisection,
+        CONCAT(SUM(SUBSTRING_INDEX(s.free_throw, '/', 1)), '/', SUM(SUBSTRING_INDEX(s.free_throw, '/', -1))) AS free_throw,
+        SUM(s.tackle) AS tackle,
+        SUM(s.block_shot) AS block_shot,
+        SUM(s.mistake) AS mistake,
+        SUM(s.foul) AS foul,
+        NULL AS hit_rate,
+        NULL AS create_by,
+        NULL AS create_time,
+        NULL AS update_by,
+        NULL AS update_time
+        FROM sta_player_statistic s
+        <where>
+            <if test="compeid != null "> and s.compeid = #{compeid}</if>
+            <if test="homeid != null "> and s.team_id = #{homeid}</if>
+            <if test="awayid != null "> and s.team_id = #{awayid}</if>
+        </where>
+        ORDER BY
+        CASE WHEN id IS NULL THEN 1 ELSE 0 END,
+        score DESC
+    </select>
+
+
+    <select id="selectStaPlayerStatisticById" parameterType="Long" resultMap="StaPlayerStatisticResult">
+        <include refid="selectStaPlayerStatisticVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selStatisticOnlyOne" parameterType="Long" resultMap="StaPlayerStatisticResult">
+        <include refid="selectStaPlayerStatisticVo"/>
+        <where>
+            <if test="compeid != null "> and compeid = #{compeid}</if>
+            <if test="playerId != null "> and player_id = #{playerId}</if>
+            <if test="teamId != null "> and team_id = #{teamId}</if>
+        </where>
+    </select>
+
+    <select id="selectStaPlayerStatisticByCompeId" parameterType="Long" resultMap="StaPlayerStatisticResult">
+        <include refid="selectStaPlayerStatisticVo"/>
+        where compeid = #{compeid}
+    </select>
+
+    <insert id="insertStaPlayerStatistic" parameterType="StaPlayerStatistic" useGeneratedKeys="true" keyProperty="id">
+        insert into sta_player_statistic
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="playerId != null">player_id,</if>
+            <if test="compeid != null">compeid,</if>
+            <if test="score != null">score,</if>
+            <if test="backboard != null">backboard,</if>
+            <if test="assist != null">assist,</if>
+            <if test="shootTheBall != null">shoot_the_ball,</if>
+            <if test="trisection != null">trisection,</if>
+            <if test="freeThrow != null">free_throw,</if>
+            <if test="tackle != null">tackle,</if>
+            <if test="blockShot != null">block_shot,</if>
+            <if test="mistake != null">mistake,</if>
+            <if test="foul != null">foul,</if>
+            <if test="hitRate != null">hit_rate,</if>
+            <if test="shoot != null">shoot,</if>
+            <if test="cover != null">cover,</if>
+            <if test="teamId != null">team_id,</if>
+            <if test="nameNum != null">name_num,</if>
+            <if test="jerseyNumber != null">jersey_number,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="playerId != null">#{playerId},</if>
+            <if test="compeid != null">#{compeid},</if>
+            <if test="score != null">#{score},</if>
+            <if test="backboard != null">#{backboard},</if>
+            <if test="assist != null">#{assist},</if>
+            <if test="shootTheBall != null">#{shootTheBall},</if>
+            <if test="trisection != null">#{trisection},</if>
+            <if test="freeThrow != null">#{freeThrow},</if>
+            <if test="tackle != null">#{tackle},</if>
+            <if test="blockShot != null">#{blockShot},</if>
+            <if test="mistake != null">#{mistake},</if>
+            <if test="foul != null">#{foul},</if>
+            <if test="hitRate != null">#{hitRate},</if>
+            <if test="shoot != null">#{shoot},</if>
+            <if test="cover != null">#{cover},</if>
+            <if test="teamId != null">#{teamId},</if>
+            <if test="nameNum != null">#{nameNum},</if>
+            <if test="jerseyNumber != null">#{jerseyNumber},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStaPlayerStatistic" parameterType="StaPlayerStatistic">
+        update sta_player_statistic
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="score != null">score = #{score},</if>
+            <if test="backboard != null">backboard = #{backboard},</if>
+            <if test="assist != null">assist = #{assist},</if>
+            <if test="shootTheBall != null">shoot_the_ball = #{shootTheBall},</if>
+            <if test="trisection != null">trisection = #{trisection},</if>
+            <if test="freeThrow != null">free_throw = #{freeThrow},</if>
+            <if test="tackle != null">tackle = #{tackle},</if>
+            <if test="blockShot != null">block_shot = #{blockShot},</if>
+            <if test="mistake != null">mistake = #{mistake},</if>
+            <if test="foul != null">foul = #{foul},</if>
+            <if test="hitRate != null">hit_rate = #{hitRate},</if>
+            <if test="shoot != null">shoot = #{shoot},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where compeid = #{compeid} and player_id = #{playerId} and team_id = #{teamId}
+    </update>
+
+    <delete id="deleteStaPlayerStatisticById" parameterType="Long">
+        delete from sta_player_statistic where id = #{id}
+    </delete>
+
+    <delete id="deleteStaPlayerStatisticByIds" parameterType="String">
+        delete from sta_player_statistic where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

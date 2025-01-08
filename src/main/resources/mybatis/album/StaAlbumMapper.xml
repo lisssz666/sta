@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.album.mapper.StaAlbumMapper">
+    <resultMap id="StaAlbumResult" type="StaAlbum">
+        <id property="id" column="id" />
+        <result property="leagueId" column="league_id" />
+        <result property="albumName" column="album_name" />
+        <result property="albumPermission" column="album_permission" />
+        <result property="parentAlbumId" column="parent_album_id" />
+        <result property="photoPath" column="photo_path" />
+    </resultMap>
+
+    <select id="selectAlbumByLeagueId" parameterType="Long" resultMap="StaAlbumResult">
+        <!-- 根据联赛ID查询相册列表 -->
+        SELECT * FROM sta_album WHERE  parent_album_id =0 and league_id = #{leagueId}
+    </select>
+
+    <select id="getPicByAlbumId" parameterType="Long" resultMap="StaAlbumResult">
+        <!-- 根据联赛ID查询相册列表 -->
+        SELECT * FROM sta_album WHERE  parent_album_id = #{id}
+    </select>
+
+    <insert id="insertAlbum" parameterType="StaAlbum">
+        <!-- 插入新相册记录 -->
+        INSERT INTO sta_album (league_id, album_name, album_permission, parent_album_id, photo_path)
+        VALUES (#{leagueId}, #{albumName}, #{albumPermission}, #{parentAlbumId}, #{photoPath})
+    </insert>
+
+    <update id="updateAlbum" parameterType="StaAlbum">
+        <!-- 更新相册记录 -->
+        UPDATE sta_album
+        SET album_name = #{albumName}, album_permission = #{albumPermission}, parent_album_id = #{parentAlbumId}, photo_path = #{photoPath}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteAlbum" parameterType="Long">
+        <!-- 删除相册记录 -->
+        DELETE FROM sta_album WHERE id = #{id}
+    </delete>
+
+
+
+</mapper>

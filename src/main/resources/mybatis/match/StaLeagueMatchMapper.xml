@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.match.mapper.StaLeagueMatchMapper">
+
+    <resultMap type="StaLeagueMatch" id="StaLeagueMatchResult">
+        <result property="id"    column="id"    />
+        <result property="leagueName"    column="league_name"    />
+        <result property="leagueLogoPath"    column="league_logo"    />
+        <result property="leagueNature"    column="league_nature"    />
+        <result property="enrollTeam"    column="enroll_team"    />
+        <result property="host"    column="host"    />
+        <result property="organizer"    column="organizer"    />
+        <result property="coOrganizer"    column="co_organizer"    />
+        <result property="sponsor"    column="sponsor"    />
+        <result property="titleSponsor"    column="title_sponsor"    />
+        <result property="notes"    column="notes"    />
+        <result property="location"    column="location"    />
+        <result property="leagueStatus"    column="league_status"    />
+        <result property="enrollStarttime"    column="enroll_starttime"    />
+        <result property="enrollEndtime"    column="enroll_endtime"    />
+        <result property="gameStarttime"    column="game_starttime"    />
+        <result property="gameEndtime"    column="game_endtime"    />
+        <result property="contactPerson"    column="contact_person"    />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="leagueBgImagePath"    column="background_image"    />
+        <result property="venue"    column="venue"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectStaLeagueMatchVo">
+        select id, league_name, league_nature, league_logo, enroll_team, host, organizer, co_organizer, sponsor, title_sponsor, notes, location, league_status, enroll_starttime, enroll_endtime, game_starttime, game_endtime, contact_person, contact_phone, background_image, venue, create_by, create_time, update_by, update_time
+        from sta_league_match
+    </sql>
+
+    <select id="selectStaLeagueMatchList" parameterType="StaLeagueMatch" resultMap="StaLeagueMatchResult">
+        <include refid="selectStaLeagueMatchVo"/>
+        <where>
+            <if test="leagueName != null and leagueName != ''"> and league_name like concat('%', #{leagueName}, '%')</if>
+            <if test="leagueStatus != null and leagueStatus != ''"> and league_status = #{leagueStatus}</if>
+            <if test="gameStarttime != null"> and game_starttime = #{gameStarttime}</if>
+            <if test="gameEndtime != null"> and game_endtime = #{gameEndtime}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectStaLeagueMatchById" parameterType="Long" resultMap="StaLeagueMatchResult">
+        <include refid="selectStaLeagueMatchVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertStaLeagueMatch" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into sta_league_match
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="leagueName != null">league_name,</if>
+            <if test="leagueLogoPath != null">league_logo,</if>
+            <if test="leagueNature != null">league_nature,</if>
+            <if test="enrollTeam != null">enroll_team,</if>
+            <if test="host != null">host,</if>
+            <if test="organizer != null">organizer,</if>
+            <if test="coOrganizer != null">co_organizer,</if>
+            <if test="sponsor != null">sponsor,</if>
+            <if test="titleSponsor != null">title_sponsor,</if>
+            <if test="notes != null">notes,</if>
+            <if test="location != null">location,</if>
+            <if test="leagueStatus != null">league_status,</if>
+            <if test="enrollStarttime != null">enroll_starttime,</if>
+            <if test="enrollEndtime != null">enroll_endtime,</if>
+            <if test="gameStarttime != null">game_starttime,</if>
+            <if test="gameEndtime != null">game_endtime,</if>
+            <if test="contactPerson != null">contact_person,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="leagueBgImagePath != null">background_image,</if>
+            <if test="venue != null">venue,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="leagueName != null">#{leagueName},</if>
+            <if test="leagueLogoPath != null">#{leagueLogoPath},</if>
+            <if test="leagueNature != null">#{leagueNature},</if>
+            <if test="enrollTeam != null">#{enrollTeam},</if>
+            <if test="host != null">#{host},</if>
+            <if test="organizer != null">#{organizer},</if>
+            <if test="coOrganizer != null">#{coOrganizer},</if>
+            <if test="sponsor != null">#{sponsor},</if>
+            <if test="titleSponsor != null">#{titleSponsor},</if>
+            <if test="notes != null">#{notes},</if>
+            <if test="location != null">#{location},</if>
+            <if test="leagueStatus != null">#{leagueStatus},</if>
+            <if test="enrollStarttime != null">#{enrollStarttime},</if>
+            <if test="enrollEndtime != null">#{enrollEndtime},</if>
+            <if test="gameStarttime != null">#{gameStarttime},</if>
+            <if test="gameEndtime != null">#{gameEndtime},</if>
+            <if test="contactPerson != null">#{contactPerson},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="leagueBgImagePath != null">#{leagueBgImagePath},</if>
+            <if test="venue != null">#{venue},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStaLeagueMatch" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        update sta_league_match
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="leagueName != null">league_name = #{leagueName},</if>
+            <if test="leagueLogoPath != null">league_logo = #{leagueLogoPath},</if>
+            <if test="leagueNature != null">league_nature = #{leagueNature},</if>
+            <if test="enrollTeam != null">enroll_team = #{enrollTeam},</if>
+            <if test="host != null">host = #{host},</if>
+            <if test="organizer != null">organizer = #{organizer},</if>
+            <if test="coOrganizer != null">co_organizer = #{coOrganizer},</if>
+            <if test="sponsor != null">sponsor = #{sponsor},</if>
+            <if test="titleSponsor != null">title_sponsor = #{titleSponsor},</if>
+            <if test="notes != null">notes = #{notes},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="leagueStatus != null">league_status = #{leagueStatus},</if>
+            <if test="enrollStarttime != null">enroll_starttime = #{enrollStarttime},</if>
+            <if test="enrollEndtime != null">enroll_endtime = #{enrollEndtime},</if>
+            <if test="gameStarttime != null">game_starttime = #{gameStarttime},</if>
+            <if test="gameEndtime != null">game_endtime = #{gameEndtime},</if>
+            <if test="contactPerson != null">contact_person = #{contactPerson},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="leagueBgImagePath != null">background_image = #{leagueBgImagePath},</if>
+            <if test="venue != null">venue = #{venue},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStaLeagueMatchById" parameterType="Long">
+        delete from sta_league_match where id = #{id}
+    </delete>
+
+    <delete id="deleteStaLeagueMatchByIds" parameterType="Long">
+        delete from sta_league_match where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

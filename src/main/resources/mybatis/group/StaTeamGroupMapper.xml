@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.group.mapper.StaTeamGroupMapper">
+        <resultMap id="TeamGroupResultMap" type="StaTeamGroup">
+            <id column="id" property="id" />
+            <result column="league_id" property="leagueId" />
+            <result column="group_name" property="groupName" />
+            <result column="team_ids" property="teamIds" />
+        </resultMap>
+
+        <sql id="TeamGroupColumns">
+        id, league_id, group_name, team_ids
+        </sql>
+
+    <select id="selectTeamGroupsByLeagueId" parameterType="Long" resultMap="TeamGroupResultMap">
+        SELECT <include refid="TeamGroupColumns" />
+        FROM sta_team_group
+        WHERE league_id = #{leagueId}
+    </select>
+
+    <!-- 根据ID查询分组信息 -->
+    <select id="selectTeamGroupById" parameterType="Long" resultType="com.ruoyi.project.group.domain.StaTeamGroup">
+        SELECT id, league_id, group_name, team_ids
+        FROM sta_team_group
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertTeamGroup" parameterType="StaTeamGroup" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sta_team_group (league_id, group_name, team_ids)
+        VALUES (#{leagueId}, #{groupName}, #{teamIds})
+    </insert>
+
+    <update id="updateTeamGroup" parameterType="StaTeamGroup">
+        UPDATE sta_team_group
+        SET
+            league_id = #{leagueId},
+            group_name = #{groupName},
+            team_ids = #{teamIds}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 新增多个球队ID到分组 -->
+    <update id="addTeamsToGroup" parameterType="map">
+        UPDATE sta_team_group
+        SET team_ids = IF(team_ids IS NULL OR team_ids = '', #{teamIds}, CONCAT(team_ids, ',', #{teamIds}))
+        WHERE id = #{groupId};
+    </update>
+
+    <!-- 删除多个球队ID从分组 -->
+    <update id="removeTeamsFromGroup" parameterType="map">
+        UPDATE sta_team_group
+        SET team_ids = TRIM(BOTH ',' FROM REPLACE(CONCAT(',', team_ids, ','), CONCAT(',', #{teamId}, ','), ','))
+        WHERE id = #{groupId};
+    </update>
+    <delete id="deleteTeamGroup" parameterType="Long">
+        DELETE FROM sta_team_group WHERE id = #{id}
+    </delete>
+
+
+</mapper>

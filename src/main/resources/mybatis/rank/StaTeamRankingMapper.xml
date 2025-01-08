@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.rank.mapper.StaTeamRankingMapper">
+
+    <resultMap type="StaBestOfGame" id="StaBestOfGameResult">
+        <result property="staItem"    column="sta_item"    />
+        <result property="homePlayerName"    column="home_player_name"    />
+        <result property="homePlayerNumber"    column="home_player_number"    />
+        <result property="homeValue"    column="home_value"    />
+        <result property="awayPlayerName"    column="away_player_name"    />
+        <result property="leagueName"    column="league_name"    />
+        <result property="awayPlayerNumber"    column="away_player_number"    />
+        <result property="awayValue"    column="away_value"    />
+    </resultMap>
+
+    <!-- 根据联赛ID查询球队榜 -->
+    <select id="selectByLeagueId" resultType="com.ruoyi.project.rank.domain.StaTeamRanking">
+        SELECT * FROM sta_team_ranking WHERE league_id = #{leagueId}
+    </select>
+
+    <select id="selectPlayersByLeagueId" resultType="com.ruoyi.project.rank.domain.StaPlayerRanking">
+        SELECT id, league_id, player_name, score, fouls, player_logo, starter_count, games_played
+        FROM sta_player_ranking
+        WHERE league_id = #{leagueId}
+    </select>
+
+    <select id="getBestOfGame" resultMap="StaBestOfGameResult">
+        SELECT
+            '得分' AS sta_item,
+            (SELECT name_num FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY score DESC LIMIT 1) AS home_player_name,
+            (SELECT jersey_number FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY score DESC LIMIT 1) AS home_player_number,
+            (SELECT score FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY score DESC LIMIT 1) AS home_value,
+            (SELECT name_num FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY score DESC LIMIT 1) AS away_player_name,
+            (SELECT jersey_number FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY score DESC LIMIT 1) AS away_player_number,
+            (SELECT score FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY score DESC LIMIT 1) AS away_value
+        FROM sta_player_statistic
+        WHERE compeid = #{compeid}
+        GROUP BY compeid
+        UNION ALL
+        SELECT
+            '篮板' AS sta_item,
+            (SELECT name_num FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY backboard DESC LIMIT 1) AS home_player_name,
+            (SELECT jersey_number FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY backboard DESC LIMIT 1) AS home_player_number,
+            (SELECT backboard FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY backboard DESC LIMIT 1) AS home_value,
+            (SELECT name_num FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY backboard DESC LIMIT 1) AS away_player_name,
+            (SELECT jersey_number FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY backboard DESC LIMIT 1) AS away_player_number,
+            (SELECT backboard FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY backboard DESC LIMIT 1) AS away_value
+        FROM sta_player_statistic
+        WHERE compeid = #{compeid}
+        GROUP BY compeid
+        UNION ALL
+        SELECT
+            '助攻' AS sta_item,
+            (SELECT name_num FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY assist DESC LIMIT 1) AS home_player_name,
+            (SELECT jersey_number FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY assist DESC LIMIT 1) AS home_player_number,
+            (SELECT assist FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{homeid} ORDER BY assist DESC LIMIT 1) AS home_value,
+            (SELECT name_num FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY assist DESC LIMIT 1) AS away_player_name,
+            (SELECT jersey_number FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY assist DESC LIMIT 1) AS away_player_number,
+            (SELECT assist FROM sta_player_statistic WHERE compeid = #{compeid} AND team_id = #{awayid} ORDER BY assist DESC LIMIT 1) AS away_value
+        FROM sta_player_statistic
+        WHERE compeid = #{compeid}
+        GROUP BY compeid;
+    </select>
+
+</mapper>

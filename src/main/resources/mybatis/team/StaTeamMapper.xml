@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.team.mapper.StaTeamMapper">
+
+    <resultMap type="StaTeam" id="StaTeamResult">
+        <result property="id"          column="id"/>
+        <result property="teamTitle"   column="team_title"/>
+        <result property="teamLogoPath"    column="team_logo"/>
+        <result property="leaderName"  column="leader_name"/>
+        <result property="leaderPhone" column="leader_phone"/>
+        <result property="city"        column="city"/>
+        <result property="homeColor"   column="home_color"/>
+        <result property="awayColor"   column="away_color"/>
+        <result property="createBy"    column="create_by"/>
+        <result property="createTime"  column="create_time"/>
+        <result property="updateBy"    column="update_by"/>
+        <result property="updateTime"  column="update_time"/>
+    </resultMap>
+
+    <sql id="selectStaTeamVo">
+    select id, team_title, team_logo, leader_name, leader_phone, city, home_color, away_color, create_by, create_time, update_by, update_time
+    from sta_team
+</sql>
+
+    <select id="selectStaTeamList" parameterType="StaTeam" resultMap="StaTeamResult">
+        <include refid="selectStaTeamVo"/>
+        <where>
+            <if test="teamTitle != null and teamTitle != ''"> and team_title = #{teamTitle}</if>
+            <if test="leaderName != null and leaderName != ''"> and leader_name = #{leaderName}</if>
+            <if test="city != null and city != ''"> and city = #{city}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectStaTeamById" parameterType="Long" resultMap="StaTeamResult">
+        <include refid="selectStaTeamVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertStaTeam" parameterType="StaTeam" useGeneratedKeys="true" keyProperty="id">
+        insert into sta_team
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="teamTitle != null">team_title,</if>
+            <if test="teamLogoPath != null">team_logo,</if>
+            <if test="leaderName != null">leader_name,</if>
+            <if test="leaderPhone != null">leader_phone,</if>
+            <if test="city != null">city,</if>
+            <if test="homeColor != null">home_color,</if>
+            <if test="awayColor != null">away_color,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="teamTitle != null">#{teamTitle},</if>
+            <if test="teamLogoPath != null">#{teamLogoPath},</if>
+            <if test="leaderName != null">#{leaderName},</if>
+            <if test="leaderPhone != null">#{leaderPhone},</if>
+            <if test="city != null">#{city},</if>
+            <if test="homeColor != null">#{homeColor},</if>
+            <if test="awayColor != null">#{awayColor},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStaTeam" parameterType="StaTeam">
+        update sta_team
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="teamTitle != null">team_title = #{teamTitle},</if>
+            <if test="teamLogo != null">team_logo = #{teamLogo},</if>
+            <if test="leaderName != null">leader_name = #{leaderName},</if>
+            <if test="leaderPhone != null">leader_phone = #{leaderPhone},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="homeColor != null">home_color = #{homeColor},</if>
+            <if test="awayColor != null">away_color = #{awayColor},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <delete id="deleteStaTeamById" parameterType="Long">
+        delete from sta_team where id = #{id}
+    </delete>
+
+    <delete id="deleteStaTeamByIds" parameterType="String">
+        delete from sta_team where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

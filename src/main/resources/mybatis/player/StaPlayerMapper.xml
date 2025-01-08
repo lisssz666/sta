@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.player.mapper.StaPlayerMapper">
+
+    <resultMap type="StaPlayer" id="StaPlayerResult">
+        <result property="id"    column="id"    />
+        <result property="teamId"    column="team_id"    />
+        <result property="logoPath"    column="logo"    />
+        <result property="name"    column="name"    />
+        <result property="jerseyNumber"    column="jersey_number"    />
+        <result property="weight"    column="weight"    />
+        <result property="height"    column="height"    />
+        <result property="position"    column="position"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectStaPlayerVo">
+        select id, team_id, logo, name, jersey_number, weight, height, position, phone_number, create_by, create_time, update_by, update_time
+        from sta_player
+    </sql>
+
+    <select id="selectStaPlayerList" parameterType="StaPlayer" resultMap="StaPlayerResult">
+        <include refid="selectStaPlayerVo"/>
+        <where>
+            <if test="teamId != null"> and team_id = #{teamId}</if>
+            <if test="name != null and name != ''"> and name = #{name}</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectStaPlayerById" parameterType="Long" resultMap="StaPlayerResult">
+        <include refid="selectStaPlayerVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertStaPlayer" parameterType="StaPlayer" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into sta_player
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="teamId != null">team_id,</if>
+            <if test="logoPath != null">logo,</if>
+            <if test="name != null">name,</if>
+            <if test="jerseyNumber != null">jersey_number,</if>
+            <if test="weight != null">weight,</if>
+            <if test="height != null">height,</if>
+            <if test="position != null">position,</if>
+            <if test="phoneNumber != null">phone_number,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="teamId != null">#{teamId},</if>
+            <if test="logoPath != null">#{logoPath},</if>
+            <if test="name != null">#{name},</if>
+            <if test="jerseyNumber != null">#{jerseyNumber},</if>
+            <if test="weight != null">#{weight},</if>
+            <if test="height != null">#{height},</if>
+            <if test="position != null">#{position},</if>
+            <if test="phoneNumber != null">#{phoneNumber},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStaPlayer" parameterType="StaPlayer">
+        update sta_player
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="teamId != null">team_id = #{teamId},</if>
+            <if test="logo != null">logo = #{logo},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="jerseyNumber != null">jersey_number = #{jerseyNumber},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="height != null">height = #{height},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStaPlayerById" parameterType="Long">
+        delete from sta_player where id = #{id}
+    </delete>
+
+    <delete id="deleteStaPlayerByIds" parameterType="String">
+        delete from sta_player where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
