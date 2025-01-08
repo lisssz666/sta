@@ -87,33 +87,19 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
         List<StaPlayerStatistic> staPlayerStatistics = staPlayerStatisticMapper.selectList(lws);
 
 
-        StaPlayerStatistic playerStatistic = StaPlayerStatistic.builder()
-                .assist(22L)
-                .backboard(22L)
-                .blockShot(22L)
-                .compeid(22L)
-                .foul(22)
-                .playerId(1L)
-                .compeid(2L)
-                .build();
-        int insert = staPlayerStatisticMapper.insert(playerStatistic);
+//        StaPlayerStatistic playerStatistic = StaPlayerStatistic.builder()
+//                .assist(22L)
+//                .backboard(22L)
+//                .blockShot(22L)
+//                .compeid(22L)
+//                .foul(22)
+//                .playerId(1L)
+//                .compeid(2L)
+//                .build();
+//        int insert = staPlayerStatisticMapper.insert(playerStatistic);
 
-        return AjaxResult.success(insert);
+        return AjaxResult.success(1);
 
-        /*staPlayerStatistic3.builder()
-                .assist(22L)
-                .backboard(22L)
-                .blockShot(22L)
-                .compeid(22L)
-                .foul(22L)
-                .playerId(1L)
-                .compeid(2L)
-                .build();
-
-//        int insert = staPlayerStatisticMapper.insert(staPlayerStatistic3);
-
-        StaPlayerStatistic staPlayerStatistic1 = staPlayerStatisticMapper.selectStaPlayerStatisticById(aLong);
-        return AjaxResult.success(staPlayerStatistic1);*/
     }
 
     /**
