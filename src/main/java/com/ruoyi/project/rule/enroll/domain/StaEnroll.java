@@ -13,8 +13,8 @@ public class StaEnroll {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private String startDate;
+    private String endDate;
     private Integer teams;
     private Integer capacity;
     private String contact;
@@ -22,8 +22,6 @@ public class StaEnroll {
     private String email;
     private String instructions;
     private Integer leagueId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     // Getters and Setters
 

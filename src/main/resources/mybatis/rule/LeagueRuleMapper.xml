@@ -10,6 +10,44 @@
         VALUES (#{leagueId},#{fmt}, #{sys}, #{ageLim}, #{periods}, #{periodDur}, #{otDur}, #{rankRules}, #{winPts}, #{lossPts})
     </insert>
 
+    <update id="updateLeagueRule" parameterType="LeagueRule">
+        UPDATE sta_league_rule
+        <set>
+            <if test="leagueId != null">
+                leagueid = #{leagueId},
+            </if>
+            <if test="fmt != null">
+                fmt = #{fmt},
+            </if>
+            <if test="sys != null">
+                sys = #{sys},
+            </if>
+            <if test="ageLim != null">
+                age_lim = #{ageLim},
+            </if>
+            <if test="periods != null">
+                periods = #{periods},
+            </if>
+            <if test="periodDur != null">
+                period_dur = #{periodDur},
+            </if>
+            <if test="otDur != null">
+                ot_dur = #{otDur},
+            </if>
+            <if test="rankRules != null">
+                rank_rules = #{rankRules},
+            </if>
+            <if test="winPts != null">
+                win_pts = #{winPts},
+            </if>
+            <if test="lossPts != null">
+                loss_pts = #{lossPts},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
     <!-- 查看记录的SQL语句 -->
     <select id="selectLeagueById" resultType="com.ruoyi.project.rule.match.domain.LeagueRule">
         SELECT * FROM sta_league_rule WHERE leagueid = #{leagueId}

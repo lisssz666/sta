@@ -107,9 +107,14 @@ public class StaTeamServiceImpl implements IStaTeamService
      * @return 结果
      */
     @Override
-    public int updateStaTeam(StaTeam staTeam)
-    {
+    public int updateStaTeam(StaTeam staTeam) throws IOException {
         staTeam.setUpdateTime(DateUtils.getNowDate());
+        MultipartFile teamLogo = staTeam.getTeamLogo();
+        if (teamLogo != null){
+            //上传logo
+            String logoPath = FileUploadUtils.upload(uploadImgPath, teamLogo);
+            staTeam.setTeamLogoPath(logoPath);
+        }
         return staTeamMapper.updateStaTeam(staTeam);
     }
 

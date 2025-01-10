@@ -5,6 +5,8 @@ import com.ruoyi.project.rule.enroll.mapper.StaEnrollMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +16,12 @@ public class StaEnrollService {
     private StaEnrollMapper repository;
 
     public StaEnroll save(StaEnroll staEnroll) {
-        return repository.save(staEnroll);
+        return this.repository.save(staEnroll);
     }
 
     public Optional<StaEnroll> update(StaEnroll staEnroll) {
         Integer id = staEnroll.getId();
-        return repository.findById(id).map(existingStaEnroll -> {
+        return this.repository.findById(id).map(existingStaEnroll -> {
             existingStaEnroll.setStartDate(staEnroll.getStartDate());
             existingStaEnroll.setEndDate(staEnroll.getEndDate());
             existingStaEnroll.setTeams(staEnroll.getTeams());
@@ -29,10 +31,10 @@ public class StaEnrollService {
             existingStaEnroll.setEmail(staEnroll.getEmail());
             existingStaEnroll.setInstructions(staEnroll.getInstructions());
             existingStaEnroll.setLeagueId(staEnroll.getLeagueId());
-            return repository.save(existingStaEnroll);
+            return (StaEnroll)this.repository.save(existingStaEnroll);
         });
     }
     public List<StaEnroll> findByLeagueId(Integer leagueId) {
-        return repository.findByLeagueId(leagueId);
+        return this.repository.findByLeagueId(leagueId);
     }
 }

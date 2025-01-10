@@ -2,10 +2,14 @@ package com.ruoyi.project.rule.match.controller;
 
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.rule.enroll.domain.StaEnroll;
 import com.ruoyi.project.rule.match.domain.LeagueRule;
 import com.ruoyi.project.rule.match.service.LeagueRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/leagueRules")
@@ -30,5 +34,11 @@ public class LeagueRuleController extends BaseController {
     @GetMapping("/list")
     public AjaxResult getAllLeagueRules() {
         return AjaxResult.success(leagueRuleService.getAllLeagueRules());
+    }
+
+    @PostMapping("/update")
+    public AjaxResult updateLeagueRule(LeagueRule league) {
+        Optional<StaEnroll> updatedStaEnroll = leagueRuleService.updateLeagueRule(league);
+        return AjaxResult.success(updatedStaEnroll);
     }
 }

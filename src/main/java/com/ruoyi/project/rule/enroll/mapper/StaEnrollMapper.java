@@ -8,5 +8,8 @@ import java.util.List;
 
 @Mapper
 public interface StaEnrollMapper extends JpaRepository<StaEnroll, Integer>{
+
     List<StaEnroll> findByLeagueId(Integer leagueId);
+
+//    StaEnroll save(StaEnroll staEnroll);
 }

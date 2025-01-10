@@ -254,8 +254,8 @@ CREATE TABLE sta_player_ranking (
 
 CREATE TABLE sta_enroll (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT '自动增长的主键',
-    start_date DATETIME COMMENT '报名开始日期',
-    end_date DATETIME COMMENT '报名结束日期',
+    start_date VARCHAR(50) COMMENT '报名开始日期',
+    end_date VARCHAR(50) COMMENT '报名结束日期',
     teams INT COMMENT '球队数量',
     capacity INT COMMENT '人数限制',
     contact VARCHAR(255) COMMENT '报名联系人',

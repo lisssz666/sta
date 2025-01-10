@@ -71,7 +71,7 @@ public class StaTeamController extends BaseController
     @ApiOperation(value = "修改球队信息")
     @Log(title = "球队信息", businessType = BusinessType.UPDATE)
     @PutMapping("/edit")
-    public AjaxResult edit(StaTeam staTeam)
+    public AjaxResult edit(StaTeam staTeam) throws IOException
     {
         return toAjax(staTeamService.updateStaTeam(staTeam));
     }

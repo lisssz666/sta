@@ -42,7 +42,7 @@ public interface IStaTeamService
      * @param staTeam 球队信息
      * @return 结果
      */
-    public int updateStaTeam(StaTeam staTeam);
+    public int updateStaTeam(StaTeam staTeam) throws IOException;
 
     /**
      * 批量删除球队信息

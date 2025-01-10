@@ -1,7 +1,9 @@
 package com.ruoyi.project.rule.match.service;
 
+import com.ruoyi.project.rule.enroll.domain.StaEnroll;
 import com.ruoyi.project.rule.match.domain.LeagueRule;
 import java.util.List;
+import java.util.Optional;
 
 public interface LeagueRuleService {
 
@@ -13,4 +15,6 @@ public interface LeagueRuleService {
 
     // 查询所有记录
     List<LeagueRule> getAllLeagueRules();
+
+    Optional<StaEnroll> updateLeagueRule(LeagueRule league);
 }

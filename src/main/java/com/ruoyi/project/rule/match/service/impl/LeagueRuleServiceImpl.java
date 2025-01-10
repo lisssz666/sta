@@ -1,11 +1,13 @@
 package com.ruoyi.project.rule.match.service.impl;
 
+import com.ruoyi.project.rule.enroll.domain.StaEnroll;
 import com.ruoyi.project.rule.match.domain.LeagueRule;
 import com.ruoyi.project.rule.match.mapper.LeagueRuleMapper;
 import com.ruoyi.project.rule.match.service.LeagueRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LeagueRuleServiceImpl implements LeagueRuleService {
@@ -34,5 +36,10 @@ public class LeagueRuleServiceImpl implements LeagueRuleService {
     @Override
     public List<LeagueRule> getAllLeagueRules() {
         return leagueMapper.selectAllLeagues();
+    }
+
+    @Override
+    public Optional<StaEnroll> updateLeagueRule(LeagueRule league) {
+        return leagueMapper.updateLeagueRule(league);
     }
 }

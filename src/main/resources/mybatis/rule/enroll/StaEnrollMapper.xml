@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.rule.enroll.mapper.StaEnrollMapper">
+
+    <!-- 新增记录的SQL语句 -->
+    <insert id="insertLeague" parameterType="LeagueRule" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sta_league_rule (leagueid,fmt, sys, age_lim, periods, period_dur, ot_dur, rank_rules, win_pts, loss_pts)
+        VALUES (#{leagueId},#{fmt}, #{sys}, #{ageLim}, #{periods}, #{periodDur}, #{otDur}, #{rankRules}, #{winPts}, #{lossPts})
+    </insert>
+
+<!--    <insert id="save" parameterType="com.ruoyi.project.rule.enroll.domain.StaEnroll">-->
+<!--        INSERT INTO sta_enroll (-->
+<!--            start_date,-->
+<!--            end_date,-->
+<!--            teams,-->
+<!--            capacity,-->
+<!--            contact,-->
+<!--            phone,-->
+<!--            email,-->
+<!--            instructions,-->
+<!--            league_id-->
+<!--        ) VALUES (-->
+<!--            #{startDate},-->
+<!--            #{endDate},-->
+<!--            #{teams},-->
+<!--            #{capacity},-->
+<!--            #{contact},-->
+<!--            #{phone},-->
+<!--            #{email},-->
+<!--            #{instructions},-->
+<!--            #{leagueId}-->
+<!--        )-->
+<!--    </insert>-->
+
+
+    <!-- 查看记录的SQL语句 -->
+    <select id="selectLeagueById" resultType="com.ruoyi.project.rule.match.domain.LeagueRule">
+        SELECT * FROM sta_league_rule WHERE leagueid = #{leagueId}
+    </select>
+
+    <select id="selectAllLeagues" resultType="com.ruoyi.project.rule.match.domain.LeagueRule">
+        SELECT * FROM sta_league_rule
+    </select>
+
+
+</mapper>
