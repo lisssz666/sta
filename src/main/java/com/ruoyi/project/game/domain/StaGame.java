@@ -1,8 +1,6 @@
 package com.ruoyi.project.game.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ruoyi.project.game.address.domain.GameAddress;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

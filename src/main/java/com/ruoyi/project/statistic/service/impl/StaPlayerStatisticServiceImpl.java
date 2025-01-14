@@ -18,8 +18,6 @@ import com.ruoyi.project.match.mapper.StaLeagueMatchMapper;
 import com.ruoyi.project.player.domain.StaPlayer;
 import com.ruoyi.project.player.mapper.StaPlayerMapper;
 import com.ruoyi.project.rank.service.impl.StaTeamRankingServiceImpl;
-import com.ruoyi.project.video.minio.config.MinioConfig;
-import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,44 +61,11 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
         return staPlayerStatisticMapper.selectStaPlayerStatisticById(id);
     }
 
-    /**
-     * 查询球员统计
-     *
-     * @return 球员统计
-     */
     @Override
-    public AjaxResult selectStaPlayerStatistic(StaPlayerStatistic staPlayerStatistic)
-    {
-        Long aLong = null;
-            aLong = Optional.ofNullable(staPlayerStatistic)
-                    .map(StaPlayerStatistic::getId).orElseGet(() ->{throw new InternalException("传人id不能为空");});
-
-        StaPlayerStatistic staPlayerStatistic2 = staPlayerStatisticMapper.selectById(aLong);
-
-        System.out.println(staPlayerStatistic2);
-        StaPlayerStatistic staPlayerStatistic3 = Optional.ofNullable(staPlayerStatistic2)
-                .orElseGet(() -> new StaPlayerStatistic());
-        System.out.println(staPlayerStatistic3);
-
-        LambdaQueryWrapper<StaPlayerStatistic> lws = new LambdaQueryWrapper<StaPlayerStatistic>()
-                .eq(StaPlayerStatistic::getCompeid,1L);
-        List<StaPlayerStatistic> staPlayerStatistics = staPlayerStatisticMapper.selectList(lws);
-
-
-//        StaPlayerStatistic playerStatistic = StaPlayerStatistic.builder()
-//                .assist(22L)
-//                .backboard(22L)
-//                .blockShot(22L)
-//                .compeid(22L)
-//                .foul(22)
-//                .playerId(1L)
-//                .compeid(2L)
-//                .build();
-//        int insert = staPlayerStatisticMapper.insert(playerStatistic);
-
-        return AjaxResult.success(1);
-
+    public AjaxResult selectStaPlayerStatistic(StaPlayerStatistic staPlayerStatistic) {
+        return null;
     }
+
 
     /**
      * 查询球员统计列表
@@ -120,9 +85,10 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
             Long compeid = compeidOptional.orElse(0L);
             // 在这里处理 compeid 不为空的情况
             StaGame staGame = staGameMapper.selectStaGameById(compeid);
-            Optional.ofNullable(staGame).orElseGet(() -> {
-                throw new InternalException("没有比赛信息");
-            });
+            if (staGame == null){
+                return AjaxResult.error("没有比赛信息");
+            }
+
             //主客队每节得分
             String hsessionsScore = staGame.getHsessionsScore();
             String[] hsplit = hsessionsScore != null ? hsessionsScore.split(","): new String[0];
@@ -210,19 +176,20 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
         Long homeId = staPlayerStatistic.getHomeid();
         Long awayId = staPlayerStatistic.getAwayid();
         Integer paused1 = staPlayerStatistic.getPaused();
-        Optional.ofNullable(compeid1).orElseGet(() -> { throw new InternalException("比赛id不能为空"); });
+        if (compeid1 == null){
+            return AjaxResult.error("比赛id不能为空");
+        }
         if(homeId == null && awayId ==null){
-            throw new InternalException("主队id或者客队id不能为空");
+            return AjaxResult.error("主队id或者客队id不能为空");
         }
         //更新数据库对象
         StaPlayerStatistic playerStatistic1 = new StaPlayerStatistic();
         StaPlayerStatistic playerStatistic = new StaPlayerStatistic();
         //暂停不需要传playerId，也不需要统计球员表
         if (paused1 == null) {
-            Optional.ofNullable(playerId).orElseGet(() -> {
-                throw new InternalException("球员id不能为空");
-            });
-
+            if (playerId == null){
+                return AjaxResult.error("球员id不能为空");
+            }
             if (homeId != null){
                 teamId =homeId;
             }else if (awayId != null){
