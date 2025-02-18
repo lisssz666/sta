@@ -120,6 +120,12 @@ public class StaLeagueMatchServiceImpl extends ServiceImpl<StaLeagueMatchMapper,
     public int updateStaLeagueMatch(StaLeagueMatch staLeagueMatch) throws IOException
     {
 //        staLeagueMatch.setUpdateTime(DateUtils.getNowDate());
+        //传字符串id
+        if (staLeagueMatch.getIdStr() != null  && !staLeagueMatch.getIdStr().isEmpty()){
+            String idStr = staLeagueMatch.getIdStr();
+            Integer i = Integer.valueOf(idStr);
+            staLeagueMatch.setId(i);
+        }
         try {
             if (staLeagueMatch.getLeagueLogo() != null && !staLeagueMatch.getLeagueLogo().isEmpty())
             {

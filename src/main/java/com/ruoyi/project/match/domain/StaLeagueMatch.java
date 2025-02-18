@@ -31,6 +31,9 @@ public class StaLeagueMatch extends BaseEntity
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    /** idStr */
+    private String idStr;
+
     /** 联赛名称 */
     private String leagueName;
 

@@ -21,6 +21,9 @@ public class StaTeam extends BaseEntity {
     /** id */
     private Long id;
 
+    /** idStr */
+    private String idStr;
+
     /** 球队名 */
     private String teamTitle;
 

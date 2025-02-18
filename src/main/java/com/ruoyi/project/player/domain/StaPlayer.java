@@ -21,6 +21,9 @@ public class StaPlayer extends BaseEntity
     /** id */
     private Long id;
 
+    /** idStr */
+    private String idStr;
+
     /** 所属球队id */
     private Long teamId;
 

@@ -109,6 +109,11 @@ public class StaTeamServiceImpl implements IStaTeamService
     @Override
     public int updateStaTeam(StaTeam staTeam) throws IOException {
         staTeam.setUpdateTime(DateUtils.getNowDate());
+        if (staTeam.getIdStr() != null  && !staTeam.getIdStr().isEmpty()){
+            String idStr = staTeam.getIdStr();
+            Long i = Long.valueOf(idStr);
+            staTeam.setId(i);
+        }
         MultipartFile teamLogo = staTeam.getTeamLogo();
         if (teamLogo != null){
             //上传logo

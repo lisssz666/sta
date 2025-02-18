@@ -183,8 +183,11 @@ public class VideoMerger {
         String outputVideoPath = DOWNLOAD_VIDEO +DIRECTORY_PATH+ "/merger/merged_video.mp4";
         File file = new File(outputVideoPath);
         MultipartFile multipartFile = convert(file);
-        //上传
-        String mergerVideo = minioConfig.putObject(multipartFile, leagueId, gameId,1);
+        // 将 leagueId 和 gameId 转换为字符串
+        String leagueIdStr = String.valueOf(leagueId);
+        String gameIdStr = String.valueOf(gameId);
+        // 上传
+        String mergerVideo = minioConfig.putObject(multipartFile, leagueIdStr, gameIdStr, 1);
         return mergerVideo;
     }
 

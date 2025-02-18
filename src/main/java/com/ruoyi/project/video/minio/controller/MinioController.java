@@ -29,8 +29,8 @@ public class MinioController {
 
     @PostMapping("/upload")
     public AjaxResult upload(@RequestParam("file") MultipartFile multipartFile,
-                             @RequestParam("leagueId") Integer leagueId,
-                             @RequestParam("gameId") Integer gameId) throws Exception {
+                             @RequestParam("leagueId") String leagueId,
+                             @RequestParam("gameId") String gameId) throws Exception {
         return AjaxResult.success(minioConfig.putObject(multipartFile,leagueId,gameId,null));
     }
 

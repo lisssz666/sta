@@ -107,6 +107,11 @@ public class StaPlayerServiceImpl implements IStaPlayerService
     @Override
     public int updateStaPlayer(StaPlayer staPlayer)
     {
+        if (staPlayer.getIdStr() != null  && !staPlayer.getIdStr().isEmpty()){
+            String idStr = staPlayer.getIdStr();
+            Long i = Long.valueOf(idStr);
+            staPlayer.setId(i);
+        }
         staPlayer.setUpdateTime(DateUtils.getNowDate());
         return staPlayerMapper.updateStaPlayer(staPlayer);
     }

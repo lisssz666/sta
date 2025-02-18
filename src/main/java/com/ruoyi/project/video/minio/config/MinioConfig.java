@@ -81,11 +81,12 @@ public class MinioConfig implements InitializingBean {
     /**
      * 上传
      */
-    public String putObject(MultipartFile multipartFile,Integer leagueId,Integer gameId ,Integer temp) throws Exception {
+    public String putObject(MultipartFile multipartFile,String leagueId,String gameId ,Integer temp) throws Exception {
         log.info("leagueId= "+leagueId);
         log.info("gameId= "+gameId);
         log.info("multipartFile= "+ multipartFile);
         System.out.print("文件： "+multipartFile);
+
         // 检查所有参数是否为空
         if (multipartFile == null || multipartFile.isEmpty() || leagueId == null || gameId == null) {
             throw new IllegalArgumentException("file、leagueId、gameId参数不能空");
