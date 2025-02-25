@@ -39,7 +39,7 @@ public class LeagueRuleServiceImpl implements LeagueRuleService {
     }
 
     @Override
-    public Optional<StaEnroll> updateLeagueRule(LeagueRule league) {
+    public LeagueRule updateLeagueRule(LeagueRule league) {
         return leagueMapper.updateLeagueRule(league);
     }
 }

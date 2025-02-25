@@ -117,7 +117,7 @@ CREATE TABLE sta_player (
     team_id BIGINT NOT NULL COMMENT '所属球队ID',
     logo VARCHAR(255) COMMENT '球员logo',
     name VARCHAR(50) NOT NULL COMMENT '球员姓名',
-    jersey_number INT COMMENT '球衣号码',
+    jersey_number INT NOT NULL COMMENT '球衣号码',
     weight DOUBLE COMMENT '体重 (kg)',
     height DOUBLE COMMENT '身高 (cm)',
     position VARCHAR(20) COMMENT '位置',

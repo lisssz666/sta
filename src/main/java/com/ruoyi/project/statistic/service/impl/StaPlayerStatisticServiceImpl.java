@@ -179,8 +179,10 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
         if (compeid1 == null){
             return AjaxResult.error("比赛id不能为空");
         }
-        if(homeId == null && awayId ==null){
-            return AjaxResult.error("主队id或者客队id不能为空");
+        if (teamId == null){
+            if(homeId == null && awayId ==null){
+                return AjaxResult.error("主队id或者客队id不能为空");
+            }
         }
         //更新数据库对象
         StaPlayerStatistic playerStatistic1 = new StaPlayerStatistic();

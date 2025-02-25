@@ -48,7 +48,7 @@ public class TableSupport
         return pageDomain;
     }
 
-    public static PageDomain buildPageRequest()
+    public static com.ruoyi.framework.web.page.PageDomain buildPageRequest()
     {
         return getPageDomain();
     }

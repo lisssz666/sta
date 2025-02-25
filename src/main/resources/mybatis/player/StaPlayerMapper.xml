@@ -30,6 +30,7 @@
         <where>
             <if test="teamId != null"> and team_id = #{teamId}</if>
             <if test="name != null and name != ''"> and name = #{name}</if>
+            <if test="jerseyNumber != null and jerseyNumber != ''"> and jersey_number = #{jerseyNumber}</if>
         </where>
         order by create_time desc
     </select>

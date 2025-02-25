@@ -16,5 +16,5 @@ public interface LeagueRuleService {
     // 查询所有记录
     List<LeagueRule> getAllLeagueRules();
 
-    Optional<StaEnroll> updateLeagueRule(LeagueRule league);
+    LeagueRule updateLeagueRule(LeagueRule league);
 }

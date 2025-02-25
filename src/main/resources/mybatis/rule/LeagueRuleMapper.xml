@@ -10,7 +10,7 @@
         VALUES (#{leagueId},#{fmt}, #{sys}, #{ageLim}, #{periods}, #{periodDur}, #{otDur}, #{rankRules}, #{winPts}, #{lossPts})
     </insert>
 
-    <update id="updateLeagueRule" parameterType="LeagueRule">
+    <update id="updateLeagueRule" parameterType="LeagueRule" useGeneratedKeys="true" keyProperty="id">
         UPDATE sta_league_rule
         <set>
             <if test="leagueId != null">

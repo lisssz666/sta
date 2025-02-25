@@ -18,5 +18,5 @@ public interface LeagueRuleMapper {
     List<LeagueRule> selectAllLeagues();
 
     // 修改记录
-    Optional<StaEnroll> updateLeagueRule(LeagueRule league);
+    LeagueRule updateLeagueRule(LeagueRule league);
 }

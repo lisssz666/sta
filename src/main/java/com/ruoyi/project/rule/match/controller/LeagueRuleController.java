@@ -38,7 +38,7 @@ public class LeagueRuleController extends BaseController {
 
     @PostMapping("/update")
     public AjaxResult updateLeagueRule(LeagueRule league) {
-        Optional<StaEnroll> updatedStaEnroll = leagueRuleService.updateLeagueRule(league);
+        LeagueRule updatedStaEnroll = leagueRuleService.updateLeagueRule(league);
         return AjaxResult.success(updatedStaEnroll);
     }
 }

@@ -132,6 +132,10 @@ public class StaPlayerStatistic extends BaseEntity
         this.vteamScore = vteamScore;
     }
 
+    public StaPlayerStatistic(int jerseyNumber, String teamId) {
+        super();
+    }
+
     public void setId(Long id)
     {
         this.id = id;
@@ -219,23 +223,4 @@ public class StaPlayerStatistic extends BaseEntity
         return foul;
     }
 
-    /*@Override
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("playerId", getPlayerId())
-            .append("compeid", getCompeid())
-            .append("score", getScore())
-            .append("backboard", getBackboard())
-            .append("assist", getAssist())
-            .append("shootTheBall", getShootTheBall())
-            .append("trisection", getTrisection())
-            .append("freeThrow", getFreeThrow())
-            .append("tackle", getTackle())
-            .append("blockShot", getBlockShot())
-            .append("mistake", getMistake())
-            .append("foul", getFoul())
-            .append("hitRate", getHitRate())
-            .toString();
-    }*/
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.project.statistic.service.impl.TextToSpeechStatsExtractor;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,6 +39,9 @@ public class StaPlayerStatisticController extends BaseController
 {
     @Autowired
     private IStaPlayerStatisticService staPlayerStatisticService;
+
+    @Autowired
+    private TextToSpeechStatsExtractor textToSpeechStatsExtractor;
 
     /**
      * 查询球员统计列表
@@ -97,4 +101,15 @@ public class StaPlayerStatisticController extends BaseController
         Long[] ids =map.get("ids");
         return toAjax(staPlayerStatisticService.deleteStaPlayerStatisticByIds(ids));
     }
+
+    /**
+     * 识别语音文本统计数据
+     */
+    @PostMapping(value = "/textToSpeechSta")
+    public AjaxResult textToSpeechSta(Long compeid)
+    {
+        return AjaxResult.success(textToSpeechStatsExtractor.textToSpeechSta(compeid));
+    }
+
+
 }
