@@ -37,9 +37,9 @@ public class TableSupport
     /**
      * 封装分页对象
      */
-    public static PageDomain getPageDomain()
+    public static com.ruoyi.framework.web.page.PageDomain getPageDomain()
     {
-        PageDomain pageDomain = new PageDomain();
+        com.ruoyi.framework.web.page.PageDomain pageDomain = new com.ruoyi.framework.web.page.PageDomain();
         pageDomain.setPageNum(ServletUtils.getParameterToInt(PAGE_NUM));
         pageDomain.setPageSize(ServletUtils.getParameterToInt(PAGE_SIZE));
         pageDomain.setOrderByColumn(ServletUtils.getParameter(ORDER_BY_COLUMN));
