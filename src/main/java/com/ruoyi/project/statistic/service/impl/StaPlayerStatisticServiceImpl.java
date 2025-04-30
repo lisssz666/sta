@@ -89,11 +89,17 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
                 return AjaxResult.error("没有比赛信息");
             }
 
-            //主客队每节得分
+            //主客队每节得分  [“YL战堂”,1,2,3,"","加时分",120]
             String hsessionsScore = staGame.getHsessionsScore();
-            String[] hsplit = hsessionsScore != null ? hsessionsScore.split(","): new String[0];
+            List<String> hsplit = new ArrayList<>(
+                    Arrays.asList(hsessionsScore != null ? hsessionsScore.split(",") : new String[0])
+            );
+            hsplit.add(0,staGame.getHomeName());
             String asessionsScore = staGame.getAsessionsScore();
-            String[] asplit = hsessionsScore != null ? asessionsScore.split(","): new String[0];
+            List<String> asplit = new ArrayList<>(
+                    Arrays.asList(hsessionsScore != null ? asessionsScore.split(",") : new String[0])
+            );
+            asplit.add(0,staGame.getAwayName());
             result.put("hsessionsScore", hsplit);
             result.put("asessionsScore", asplit);
             //主客队分数

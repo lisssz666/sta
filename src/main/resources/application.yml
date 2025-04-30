@@ -20,6 +20,11 @@ server:
   # 服务器的HTTP端口，默认为8080
 #  port: 8094
   port: 8088
+  ssl:
+    key-store: classpath:ybyoulan.cn.pfx
+    key-store-type: PKCS12
+    key-store-password: 58b03585v2dtp1
+    key-alias: ybyoulan.cn
   servlet:
     # 应用的访问路径
     context-path: /
@@ -56,16 +61,23 @@ spring:
        # 设置总上传的文件大小
        max-request-size:  1024MB
   upload:
-    #开发环境
+    #开发环境-MAC电脑
 #    server: http://127.0.0.1:8088
 #    path: /Users/lisenshuai/Desktop/李森帅专用文件夹/其他文档/上传的文件
 #    videopath: /Users/lisenshuai/Desktop/李森帅专用文件夹/其他文档/上传的文件
 #    ffmpeg: /Users/lisenshuai/ffmpeg/ffmpeg
+
+    #开发环境-windown电脑
+#    server: http://127.0.0.1:8088
+#    path: D:/文件/图片文件/
+#    videopath: D:/文件/视频文件/
+#    ffmpeg: /Users/lisenshuai/ffmpeg/ffmpeg
+
     #正式环境
-    server: http://1.12.77.209
-    path: /home/web/dist/image
-    videopath: /home/web/dist/video/
-    ffmpeg: /root/miniconda3/bin/ffmpeg
+    server: http://114.132.162.213
+    path: /home/web/dist/yinbo/img
+    videopath: /home/web/dist/yinbo/video/
+    ffmpeg: /usr/local/bin/ffmpeg
   # 服务模块
   devtools:
     restart:
@@ -97,10 +109,10 @@ spring:
 
 
 minio:
-  host: http://1.12.77.209:9098
+  host: http://114.132.162.213:9098
   url: ${minio.host}/${minio.bucket}/
-  access-key: khPKTKcM5LGqEgwifptA
-  secret-key: kqyvcMH1ziuSuM8gJrfepENLADpRxkHSDprilunr
+  access-key: HzGht0pmB3G5MBEMegTy
+  secret-key: WdzF5H5DrghjDxaYOH6XtzFeZnJLPYNGATYrexuR
   bucket: livzon
 
 # token配置

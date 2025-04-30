@@ -74,7 +74,7 @@ public class VideoProcessor {
             // 合并所有视频片段
 //            String outputVideo = "/Users/lisenshuai/Desktop/李森帅专用文件夹/其他文档/上传的文件/video/output/highlight.mp4";
             String outputVideo = "/home/video/highlights/highlight.mp4";
-            String result = "1.12.77.209/home/video/highlights/highlight.mp4";
+            String result = "114.132.162.213/home/video/highlights/highlight.mp4";
 
             // 使用concat协议合并片段
 //            String concatInputFile = "/Users/lisenshuai/Desktop/李森帅专用文件夹/其他文档/上传的文件/video/output/concat.txt";

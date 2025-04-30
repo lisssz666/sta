@@ -2,9 +2,9 @@ package com.ruoyi.project.video.minio.controller;
 
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.video.minio.config.MinioConfig;
-import io.minio.MinioClient;
-import io.minio.GetObjectArgs;
-import io.minio.Result;
+import io.minio.*;
+import io.minio.errors.*;
+import io.minio.http.Method;
 import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class VideoMerger {
@@ -59,7 +61,9 @@ public class VideoMerger {
     private static String DIRECTORY_PATH = null;  //"league"+leagueId+"/game"+gameId+"/";
 
     //合并所有小视频到一个视频
-    public AjaxResult fullPlayBlack(Integer leagueId, Integer gameId ) {
+    public AjaxResult fullPlayBlack(String leagueId, String gameId ) {
+        System.out.println("开始合并视频");
+        System.out.println("参数 ：leagueId :"+leagueId +",参数 ：gameId :"+gameId);
         try {
             MinioClient minioClient = MinioClient.builder()
                     .endpoint(MINIO_URL)
@@ -67,9 +71,14 @@ public class VideoMerger {
                     .build();
 
             DIRECTORY_PATH = "league"+leagueId+"/game"+gameId;
+
+            System.out.println("DIRECTORY_PATH："+ DIRECTORY_PATH);
+            System.out.println("BUCKET_NAME："+ BUCKET_NAME);
+            System.out.println("minioClient："+ minioClient);
             // List of video files to merge
             ArrayList<String> videoFiles = listVideoFilesInDirectory(minioClient, BUCKET_NAME, DIRECTORY_PATH +"/video/");
 
+            System.out.println("videoFiles："+ videoFiles);
             String reMergerVideo = null;
             if (!videoFiles.isEmpty()) {
                 // Download videos from MinIO
@@ -108,7 +117,7 @@ public class VideoMerger {
 
     private static void downloadVideo(MinioClient minioClient, String bucketName, String objectName) throws Exception {
         try (InputStream stream = minioClient.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build())) {
-            objectName = DOWNLOAD_VIDEO + objectName;  //objectName :league1/game1/403_1732089391.mp4
+            objectName = DOWNLOAD_VIDEO + objectName;  //DOWNLOAD_VIDEO ：D:\文件\视频文件  objectName :league1/game1/403_1732089391.mp4
             File file = new File(objectName);
             File parentDir = file.getParentFile();
             if (!parentDir.exists()) {
@@ -173,12 +182,8 @@ public class VideoMerger {
 //            }
         }
     }
-    /*private static void uploadVideo(MinioClient minioClient, String bucketName, String objectName) throws Exception {
-        try (InputStream stream = Paths.get(objectName).toUri().toURL().openStream()) {
-            minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(objectName).stream(stream, -1, 10485760).build());
-        }
-    }*/
-    private String uploadVideo(Integer leagueId,Integer gameId) throws Exception {
+
+    private String uploadVideo(String leagueId,String gameId) throws Exception {
         //合并存放的路径
         String outputVideoPath = DOWNLOAD_VIDEO +DIRECTORY_PATH+ "/merger/merged_video.mp4";
         File file = new File(outputVideoPath);

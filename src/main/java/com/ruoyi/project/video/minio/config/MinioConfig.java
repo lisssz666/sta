@@ -292,10 +292,11 @@ public class MinioConfig implements InitializingBean {
             Iterable<Result<Item>> myObjects = listObjects(bucketName);
             for (Result<Item> result : myObjects) {
                 Item item = result.get();
-                listObjectNames.add(item.objectName());
+                String itemName = item.objectName();
+                itemName= host+"/"+bucketName+"/"+itemName;
+                listObjectNames.add(itemName);
             }
         }
-
         return listObjectNames;
     }
 

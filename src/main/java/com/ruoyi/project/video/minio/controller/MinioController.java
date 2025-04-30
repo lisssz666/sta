@@ -75,7 +75,7 @@ public class MinioController {
 
     // 合并比赛视频
     @PostMapping("/fullPlayBlack")
-    public AjaxResult fullPlayBlack(Integer leagueId,Integer gameId) throws Exception {
+    public AjaxResult fullPlayBlack(@RequestParam("leagueId") String leagueId,@RequestParam("gameId") String gameId) throws Exception {
         return videoMerger.fullPlayBlack(leagueId, gameId);
     }
 }

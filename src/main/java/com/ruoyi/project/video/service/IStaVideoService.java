@@ -2,6 +2,8 @@ package com.ruoyi.project.video.service;
 
 import java.io.IOException;
 import java.util.List;
+
+import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.video.domain.StaVideo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,5 +66,7 @@ public interface IStaVideoService
     /**
      * 上传视频文件
      */
-    Object uploadVideo(MultipartFile file) throws IOException;
+    Object uploadVideo(MultipartFile file, String leagueId, String gameId) throws IOException;
+
+    AjaxResult fullPlayBlack(String leagueId, String gameId) throws Exception;
 }

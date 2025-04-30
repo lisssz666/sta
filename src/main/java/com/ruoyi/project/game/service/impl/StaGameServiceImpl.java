@@ -3,13 +3,10 @@ package com.ruoyi.project.game.service.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.project.game.address.domain.GameAddress;
 import com.ruoyi.project.game.address.mapper.GameAddressRepository;
-import com.ruoyi.project.match.domain.StaLeagueMatch;
 import com.ruoyi.project.match.mapper.StaLeagueMatchMapper;
 import com.ruoyi.project.player.domain.StaPlayer;
 import com.ruoyi.project.player.mapper.StaPlayerMapper;
@@ -152,20 +149,14 @@ public class StaGameServiceImpl implements IStaGameService
     @Override
     public int updateStaGame(StaGame staGame) {
         staGame.setUpdateTime(DateUtils.getNowDate());
-        int i = staGameMapper.updateStaGame(staGame);
         StaGame staGame1 = staGameMapper.selectStaGameById(staGame.getId());
         int gameStatus = staGame.getGameStatus();
         StaGame game = new StaGame();
         game.setId(staGame.getId());
         // 定义一个方法来更新得分
         updateScoresBasedOnGameStatus(staGame1, game, gameStatus);
-
-        int res = staGameMapper.updateStaGame(game);
-        return res;
+        return 1;
     }
-
-
-
 
 
     /**
@@ -195,31 +186,36 @@ public class StaGameServiceImpl implements IStaGameService
 
     //统计两队每节得分，入库
     private void updateScoresBasedOnGameStatus(StaGame staGame1, StaGame game, int gameStatus) {
+        //获取主客队每节得分
         String hsessionsScore = staGame1.getHsessionsScore();
         String asessionsScore = staGame1.getAsessionsScore();
+
         //第一节得分
         if (gameStatus == 2) {
-            game.setHsessionsScore(hsessionsScore !=null ? staGame1.getHteamScore().toString() : "0");
-            game.setAsessionsScore(asessionsScore !=null ? staGame1.getVteamScore().toString() : "0");
+            String score = staGame1.getHteamScore().toString();
+            String hsessionsStr = score +","+"0"+","+"0"+","+"0";
+            game.setHsessionsScore( hsessionsStr);
+            String ascore = staGame1.getVteamScore().toString();
+            String asessionsStr = ascore +","+"0"+","+"0"+","+"0";
+            game.setAsessionsScore(asessionsStr);
             //第二节得分
-        }else if (gameStatus == 4){
-            if (hsessionsScore != null) {
+        }
+        if (hsessionsScore != null && asessionsScore != null) {
+            List<String> split = Arrays.asList(hsessionsScore.split(","));
+            List<String> asplit = Arrays.asList(asessionsScore.split(","));
+            if (gameStatus == 4) {
+                Integer one = Integer.valueOf(split.get(0));
                 Integer hteamScore = staGame1.getHteamScore();
-                Integer sscore = Integer.valueOf(hsessionsScore);
-                Integer res = hteamScore - sscore;
-                game.setHsessionsScore(hsessionsScore+","+res);
-            }
-            if (asessionsScore != null) {
+                Integer res = hteamScore - one; //当前总分 - 第一节分数 ==第二节分数
+                game.setHsessionsScore(one + "," + res + "," + "0" + "," + "0");
+
+                Integer aone = Integer.valueOf(asplit.get(0));
                 Integer ateamScore = staGame1.getVteamScore();
-                Integer sscore = Integer.valueOf(asessionsScore);
-                Integer res = ateamScore - sscore;
-                game.setAsessionsScore(asessionsScore+","+res);
-            }
-            //第三节得分
-        }else if (gameStatus == 6){
-            if (hsessionsScore != null && asessionsScore != null){
-                List<String> split = Arrays.asList(hsessionsScore.split(","));
-                List<String> asplit = Arrays.asList(asessionsScore.split(","));
+                Integer ares = ateamScore - aone;
+                game.setAsessionsScore(aone + "," + ares + "," + "0" + "," + "0");
+
+                //第三节得分
+            } else if (gameStatus == 6) {
                 Integer one = Integer.valueOf(split.get(0));
                 Integer tow = Integer.valueOf(split.get(1));
 
@@ -234,16 +230,13 @@ public class StaGameServiceImpl implements IStaGameService
                     ateamScore = 0;
                 }
                 // 执行减法操作
-                Integer result = hteamScore - one - tow;
-                Integer aresult = ateamScore - aone - atow;
-                game.setHsessionsScore(hsessionsScore+","+result);
-                game.setAsessionsScore(asessionsScore+","+aresult);
-            }
-            //第四节得分
-        }else if (gameStatus == 8){
-            if (hsessionsScore != null && asessionsScore != null){
-                List<String> split = Arrays.asList(hsessionsScore.split(","));
-                List<String> asplit = Arrays.asList(asessionsScore.split(","));
+                Integer three = hteamScore - one - tow; //总分 - 第一节 - 第二节
+                Integer athree = ateamScore - aone - atow;
+                game.setHsessionsScore(one + "," + tow + "," + three + "," + "0");
+                game.setAsessionsScore(aone + "," + atow + "," + athree + "," + "0");
+
+                //第四节得分
+            } else if (gameStatus == 8) {
                 Integer one = Integer.valueOf(split.get(0));
                 Integer tow = Integer.valueOf(split.get(1));
                 Integer three = Integer.valueOf(split.get(2));
@@ -260,12 +253,39 @@ public class StaGameServiceImpl implements IStaGameService
                     ateamScore = 0;
                 }
                 // 执行减法操作
-                Integer result = hteamScore - one - tow -three;
-                Integer aresult = ateamScore - aone - atow - athree;
-                game.setHsessionsScore(hsessionsScore+","+result);
-                game.setAsessionsScore(asessionsScore+","+aresult);
+                Integer four = hteamScore - one - tow - three;
+                Integer afour = ateamScore - aone - atow - athree;
+                game.setHsessionsScore(one + "," + tow + "," + three + "," + four);
+                game.setAsessionsScore(one + "," + tow + "," + three + "," + afour);
+            } else if (gameStatus == 13) { //13表示比赛已经结束
+                // 计算每节比赛的总和
+                //主队
+                int sum = 0;
+                for (String str : split) {
+                    if (str.trim().matches("\\d+")) {  // 检查是否是纯数字
+                        sum += Integer.parseInt(str.trim());
+                    }
+                }
+                List<String> result = new ArrayList<>(split);
+                result.add(String.valueOf(sum));
+                //客队
+                int asum = 0;
+                for (String str : asplit) {
+                    if (str.trim().matches("\\d+")) {  // 检查是否是纯数字
+                        asum += Integer.parseInt(str.trim());
+                    }
+                }
+                List<String> aresult = new ArrayList<>(asplit);
+                aresult.add(String.valueOf(asum));
+                // 转换成 String，并用逗号连接（去掉 []）
+                String resultString = String.join(",", result);
+                String aresultString = String.join(",", aresult);
+
+                game.setHsessionsScore(resultString);
+                game.setAsessionsScore(aresultString);
             }
         }
+        int res = staGameMapper.updateStaGame(game);
     }
 
     // 封装日期格式化逻辑到单独的方法中
