@@ -71,7 +71,7 @@ spring:
 #    server: http://127.0.0.1:8088
 #    path: D:/文件/图片文件/
 #    videopath: D:/文件/视频文件/
-#    ffmpeg: /Users/lisenshuai/ffmpeg/ffmpeg
+#    ffmpeg: C:\Users\47232\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe
 
     #正式环境
     server: http://114.132.162.213

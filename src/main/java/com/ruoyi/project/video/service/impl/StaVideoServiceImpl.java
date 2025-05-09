@@ -1,9 +1,13 @@
 package com.ruoyi.project.video.service.impl;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
@@ -17,6 +21,8 @@ import com.ruoyi.project.video.mapper.StaVideoMapper;
 import com.ruoyi.project.video.domain.StaVideo;
 import com.ruoyi.project.video.service.IStaVideoService;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 视频录像文件Service业务层处理
@@ -43,6 +49,13 @@ public class StaVideoServiceImpl implements IStaVideoService
     //ffmpeg目录
     @Value("${spring.upload.ffmpeg}")
     private String ffmpegPath;
+
+    private static String FFMPEG_PATH;   //安装的ffmpeg目录
+
+    @PostConstruct
+    public void init() {
+        FFMPEG_PATH = ffmpegPath;
+    }
 
     /**
      * 查询视频录像文件
@@ -148,123 +161,124 @@ public class StaVideoServiceImpl implements IStaVideoService
     }
 
     @Override
-    public AjaxResult fullPlayBlack(String leagueId, String gameId) throws Exception {
-        // 获取目录路径
-        String videoFiles2 = uploadPath + "league" + leagueId + "/game" + gameId + "/";
-        File directory = new File(videoFiles2 + "video/");
-        System.out.println("比赛所有视频文件目录：" + directory.getAbsolutePath());
+    public AjaxResult fullPlayBlack(String leagueId, String gameId) {
+        Path baseDir = Paths.get(uploadPath, "league" + leagueId, "game" + gameId);
+        Path videoDir = baseDir.resolve("video");
+        Path outputDir = baseDir.resolve("merger");
+        Path outputVideo = outputDir.resolve("merged_video.mp4");
+        Path fileListPath = baseDir.resolve("filelist.txt");
 
-        // 递归获取所有MP4文件并预处理
-        List<File> videoFiles = getAllMp4Files(directory);
-        if (videoFiles == null || videoFiles.isEmpty()) {
-            return AjaxResult.error("没有找到视频文件");
+        // 1. 验证视频目录有效性
+        if (!Files.isDirectory(videoDir)) {
+            return AjaxResult.error("视频目录不存在: " + videoDir);
         }
 
-        // ---------- 关键修复1：转换所有分片为分段MP4 ----------
-        File tempDir = new File(videoFiles2 + "temp/");
-        if (!tempDir.exists() && !tempDir.mkdirs()) {
-            throw new Exception("无法创建临时目录");
-        }
-
-        List<File> processedFiles = new ArrayList<>();
-        for (File videoFile : videoFiles) {
-            File outputFile = new File(tempDir, videoFile.getName());
-            convertToFragmentedMp4(videoFile, outputFile); // 调用转换方法
-            processedFiles.add(outputFile);
-        }
-
-        // ---------- 关键修复2：生成安全的文件列表 ----------
-        String FILE_LIST_PATH = videoFiles2 + "filelist.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_LIST_PATH))) {
-            for (File videoFile : processedFiles) {
-                String safePath = videoFile.getAbsolutePath()
-                        .replace("\\", "/")
-                        .replace("'", "'\\'");
-                writer.write("file '" + safePath + "'\n");
-            }
-        }
-
-        // ---------- 关键修复3：调整FFmpeg命令 ----------
-        String outputVideoPath = videoFiles2 + "merger/merged_video.mp4";
-        File parentDir = new File(outputVideoPath).getParentFile();
-        if (!parentDir.exists() && !parentDir.mkdirs()) {
-            throw new Exception("无法创建输出目录");
-        }
-
-        String cmd = String.format("%s -y -f concat -safe 0 -fflags +genpts -i \"%s\" -c copy \"%s\"",
-                ffmpegPath, FILE_LIST_PATH, outputVideoPath);
-
-        // ---------- 执行命令并捕获错误流 ----------
+        // 2. 获取有序视频文件列表
+        List<Path> videoFiles;
         try {
-            Process process = Runtime.getRuntime().exec(cmd);
-
-            // 打印标准输出和错误流
-            Thread stdoutThread = new Thread(() -> {
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println("[FFmpeg] " + line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            stdoutThread.start();
-
-            Thread stderrThread = new Thread(() -> {
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getErrorStream()))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.err.println("[FFmpeg Error] " + line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-            stderrThread.start();
-
-            int exitCode = process.waitFor();
-            stdoutThread.join();
-            stderrThread.join();
-
-            if (exitCode != 0) {
-                return AjaxResult.error("视频合并失败，FFmpeg错误码: " + exitCode);
+            videoFiles = getAllMp4Files(videoDir);
+            if (videoFiles.isEmpty()) {
+                return AjaxResult.error("未找到MP4视频文件");
             }
+        } catch (IOException e) {
+            return AjaxResult.error("视频文件扫描失败: " + e.getMessage());
+        }
 
-            System.out.println("视频合并完成！");
+        // 3. 创建输出目录
+        try {
+            Files.createDirectories(outputDir);
+        } catch (IOException e) {
+            return AjaxResult.error("创建输出目录失败: " + e.getMessage());
+        }
+
+        // 4. 生成FFmpeg文件列表
+        try {
+            generateFileList(fileListPath, videoFiles);
+        } catch (IOException e) {
+            return AjaxResult.error("文件列表生成失败: " + e.getMessage());
+        }
+
+        // 5. 执行FFmpeg命令
+        try {
+            executeFfmpegCommand(fileListPath, outputVideo);
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return AjaxResult.error("视频合并失败: " + e.getMessage());
         } finally {
-            // 清理临时文件
-            deleteDirectory(tempDir);
-            new File(FILE_LIST_PATH).delete();
+            cleanupTempFile(fileListPath);
         }
 
-        return AjaxResult.success(serverPath + outputVideoPath);
+        return AjaxResult.success(serverPath + outputVideo.toString().replace(File.separator, "/"));
     }
 
-    // 新增方法：转换视频为分段MP4格式
-    private void convertToFragmentedMp4(File inputFile, File outputFile) throws IOException, InterruptedException {
-        String cmd = String.format("%s -y -i \"%s\" -movflags frag_keyframe+empty_moov -c copy \"%s\"",
-                ffmpegPath, inputFile.getAbsolutePath(), outputFile.getAbsolutePath());
-        Process process = Runtime.getRuntime().exec(cmd);
-        process.waitFor();
-        if (process.exitValue() != 0) {
-            throw new IOException("视频转换失败: " + inputFile.getName());
+    private List<Path> getAllMp4Files(Path directory) throws IOException {
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths
+                    .filter(path -> path.toString().toLowerCase().endsWith(".mp4"))
+                    .sorted(Comparator.comparing(Path::getFileName))
+                    .collect(Collectors.toList());
         }
     }
 
-    // 辅助方法：递归删除目录
-    private void deleteDirectory(File dir) {
-        if (dir.isDirectory()) {
-            for (File file : dir.listFiles()) {
-                deleteDirectory(file);
+    private void generateFileList(Path fileListPath, List<Path> videoFiles) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(fileListPath)) {
+            for (Path videoFile : videoFiles) {
+                String escapedPath = videoFile.toAbsolutePath()
+                        .toString()
+                        .replace("'", "'\\''");
+                writer.write(String.format("file '%s'%n", escapedPath));
             }
         }
-        dir.delete();
     }
 
+    private void executeFfmpegCommand(Path fileListPath, Path outputVideo)
+            throws IOException, InterruptedException {
 
+        List<String> command = new ArrayList<>();
+        command.add(FFMPEG_PATH);
+        Collections.addAll(command,
+                "-f", "concat",
+                "-safe", "0",
+                "-i", fileListPath.toString(),
+                "-c", "copy",
+                "-y",
+                "-loglevel", "warning",  // 精简日志输出
+                outputVideo.toString()
+        );
+
+        ProcessBuilder pb = new ProcessBuilder(command)
+                .redirectErrorStream(true);  // 合并标准错误流
+
+        Process process = pb.start();
+        consumeOutputStream(process.getInputStream());  // 防止缓冲区阻塞
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new IOException("FFmpeg异常退出，代码: " + exitCode);
+        }
+    }
+
+    private void consumeOutputStream(InputStream inputStream) {
+        new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println("[FFmpeg] " + line);
+                }
+            } catch (IOException e) {
+                System.err.println("日志输出流处理异常: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    private void cleanupTempFile(Path fileListPath) {
+        try {
+            Files.deleteIfExists(fileListPath);
+        } catch (IOException e) {
+            System.err.println("临时文件删除失败: " + fileListPath);
+        }
+    }
 
     // 递归获取所有MP4文件
     private List<File> getAllMp4Files(File directory) {
