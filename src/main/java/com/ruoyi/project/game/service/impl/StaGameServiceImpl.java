@@ -1,8 +1,15 @@
 package com.ruoyi.project.game.service.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.framework.web.domain.AjaxResult;
@@ -12,12 +19,19 @@ import com.ruoyi.project.player.domain.StaPlayer;
 import com.ruoyi.project.player.mapper.StaPlayerMapper;
 import com.ruoyi.project.statistic.domain.StaPlayerStatistic;
 import com.ruoyi.project.statistic.mapper.StaPlayerStatisticMapper;
+import com.ruoyi.project.video.clip.VideoProcessor;
+import com.ruoyi.project.video.controller.StaVideoController;
+import com.ruoyi.project.video.service.IStaVideoService;
+import com.ruoyi.project.video.service.impl.StaVideoServiceImpl;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.game.mapper.StaGameMapper;
 import com.ruoyi.project.game.domain.StaGame;
 import com.ruoyi.project.game.service.IStaGameService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 比赛信息Service业务层处理
@@ -47,6 +61,16 @@ public class StaGameServiceImpl implements IStaGameService
 
     @Autowired
     private GameAddressRepository gameAddressRepository;
+
+    @Autowired
+    private StaVideoController staVideoController;
+
+    @Autowired
+    private IStaVideoService staVideoService;
+
+    @Autowired
+    private VideoProcessor videoProcessor;
+
 
     /**
      * 查询比赛信息
@@ -131,11 +155,7 @@ public class StaGameServiceImpl implements IStaGameService
                 staPlayerStatistic.setJerseyNumber(player.getJerseyNumber());
                 staPlayerStatisticMapper.insertStaPlayerStatistic(staPlayerStatistic);
             }
-            //每个队都加一个"其他"
-            staPlayerStatistic.setJerseyNumber(100);
-            staPlayerStatistic.setPlayerId(1000L);
-            staPlayerStatistic.setNameNum("其他");
-            staPlayerStatisticMapper.insertStaPlayerStatistic(staPlayerStatistic);
+
         }
         return AjaxResult.success("新增比赛成功",staGame.getId());
     }
@@ -147,7 +167,8 @@ public class StaGameServiceImpl implements IStaGameService
      * @return 结果
      */
     @Override
-    public int updateStaGame(StaGame staGame) {
+    public AjaxResult updateStaGame(StaGame staGame) throws Exception {
+        AjaxResult result = null;
         staGame.setUpdateTime(DateUtils.getNowDate());
         StaGame staGame1 = staGameMapper.selectStaGameById(staGame.getId());
         int gameStatus = staGame.getGameStatus();
@@ -155,7 +176,27 @@ public class StaGameServiceImpl implements IStaGameService
         game.setId(staGame.getId());
         // 定义一个方法来更新得分
         updateScoresBasedOnGameStatus(staGame1, game, gameStatus);
-        return 1;
+
+        Long leagueId = staGame.getLeagueId();
+        Long gameId = staGame.getId();
+        //比赛结束，自动合并视频
+        if (gameStatus == 13 && leagueId != null && gameId != null)
+        {
+            System.out.println("开始合并！！");
+            //合并视频
+            result = staVideoService.fullPlayBlack(leagueId.toString(),gameId.toString());
+            //生成个人集锦
+            Object msg = result.get("msg");
+            System.out.println("msg:"+msg);
+            if (msg == null) {
+                return AjaxResult.success("视频路径为空，不能生成个人集锦");
+            }
+            List<StaPlayerStatistic> staPlayerStatistics = staPlayerStatisticMapper.selectStaPlayerStatisticByCompeId(staGame.getId());
+            System.out.println("staPlayerStatistics==:"+staPlayerStatistics);
+            generatePersonalHighlights(staPlayerStatistics, staGame1.getPlayingTime(), msg.toString(), leagueId, gameId);
+            
+        }
+        return result;
     }
 
 
@@ -191,7 +232,7 @@ public class StaGameServiceImpl implements IStaGameService
         String asessionsScore = staGame1.getAsessionsScore();
 
         //第一节得分
-        if (gameStatus == 2) {
+        if (gameStatus == 2 && staGame1.getHteamScore() != null && staGame1.getVteamScore() != null) {
             String score = staGame1.getHteamScore().toString();
             String hsessionsStr = score +","+"0"+","+"0"+","+"0";
             game.setHsessionsScore( hsessionsStr);
@@ -285,6 +326,7 @@ public class StaGameServiceImpl implements IStaGameService
                 game.setAsessionsScore(aresultString);
             }
         }
+        game.setGameStatus(gameStatus);
         int res = staGameMapper.updateStaGame(game);
     }
 
@@ -302,5 +344,65 @@ public class StaGameServiceImpl implements IStaGameService
             e.printStackTrace(); // 或者记录日志，而不是直接打印堆栈跟踪
             return playingTime; // 返回原始字符串或者null，取决于你的业务需求
         }
+    }
+
+    /**
+     * 合并完视频后-异步生成个人集锦
+     * @param staPlayerStatistics 球员统计数据列表
+     * @param playingTime 比赛开始时间戳
+     * @param videoUrl 视频URL
+     * @param leagueId 联赛ID
+     * @param gameId 比赛ID
+     */
+    private void generatePersonalHighlights(List<StaPlayerStatistic> staPlayerStatistics, String playingTime, String videoUrl, Long leagueId, Long gameId) {
+        List<Integer> goalTimes = new ArrayList<>();
+        long playingTimeLong = 0;
+        // 将playingTime从日期时间字符串转换为时间戳
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = format.parse(playingTime);
+            playingTimeLong = date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        for (StaPlayerStatistic statistic : staPlayerStatistics) {
+            Integer jerseyNumber = statistic.getJerseyNumber();
+            System.out.println("jerseyNumber=== "+jerseyNumber);
+            Long score = statistic.getScore();
+            // 得分超过15分才有集锦
+            if (score > 15) {
+                String dotTimeMap = statistic.getDotTime();
+                if (dotTimeMap != null && !dotTimeMap.isEmpty()) {
+                    String[] times = dotTimeMap.split(",");
+                    for (String timeStr : times) {
+                        long time = Long.parseLong(timeStr.trim());
+                        //得分时间戳减去比赛开始时间 等于比赛得分时的秒数
+                        long adjustedTimeInMillis = time - playingTimeLong;
+                        int adjustedTimeInSeconds = (int) (adjustedTimeInMillis / 1000); // 转换为秒
+                        goalTimes.add(adjustedTimeInSeconds);
+                    }
+                    if (videoUrl != null) {
+                        // 调用 createHighlightVideo 方法，传入 multipartFile 和 goalTimes
+                        videoProcessor.createHighlightVideo(videoUrl, goalTimes, leagueId.toString(), gameId.toString(),jerseyNumber);
+                    }
+                }
+            }
+        }
+
+    }
+    //将本地的文件目录转换成文件
+    public MockMultipartFile convertLocalFileToMultipartFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        InputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[(int) file.length()];
+        inputStream.read(bytes);
+        inputStream.close();
+
+        return new MockMultipartFile(
+                "video",
+                file.getName(),
+                "video/mp4",
+                bytes
+        );
     }
 }

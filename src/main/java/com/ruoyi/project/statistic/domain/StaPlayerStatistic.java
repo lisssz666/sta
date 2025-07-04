@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
+import java.util.Map;
 
 /**
  * 球员统计对象 sta_player_statistic
@@ -99,13 +102,14 @@ public class StaPlayerStatistic extends BaseEntity
     /** 客队分数 */
     private Integer vteamScore;
 
+    /** 打点时间戳 */
+    private String dotTime;
+
+
 
     public StaPlayerStatistic(){}
 
-//
-//    /** 球队 */
-//    private String teamTitle;
-    public StaPlayerStatistic(Long id, Long playerId, Long compeid, Long score, Long backboard, Long assist, Long tackle, Long cover, String shootTheBall, String shoot, String trisection, String freeThrow, Long blockShot, Long mistake, Integer foul, int paused, String hitRate, Long teamId, String nameNum, Integer jerseyNumber, Long homeid, Long awayid, Integer hteamScore, Integer vteamScore) {
+    public StaPlayerStatistic(Long id, Long playerId, Long compeid, Long score, Long backboard, Long assist, Long tackle, Long cover, String shootTheBall, String shoot, String trisection, String freeThrow, Long blockShot, Long mistake, Integer foul, Integer paused, String hitRate, Long teamId, String nameNum, Integer jerseyNumber, Long homeid, Long awayid, Integer hteamScore, Integer vteamScore, String dotTime) {
         this.id = id;
         this.playerId = playerId;
         this.compeid = compeid;
@@ -130,6 +134,7 @@ public class StaPlayerStatistic extends BaseEntity
         this.awayid = awayid;
         this.hteamScore = hteamScore;
         this.vteamScore = vteamScore;
+        this.dotTime = dotTime;
     }
 
     public StaPlayerStatistic(int jerseyNumber, String teamId) {

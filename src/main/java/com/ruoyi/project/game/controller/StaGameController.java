@@ -72,9 +72,8 @@ public class StaGameController extends BaseController
      */
     @ApiOperation(value = "修改比赛信息")
     @PutMapping("/edit")
-    public AjaxResult edit(StaGame staGame)
-    {
-        return toAjax(staGameService.updateStaGame(staGame));
+    public AjaxResult edit(StaGame staGame) throws Exception {
+        return AjaxResult.success(staGameService.updateStaGame(staGame));
     }
 
     /**

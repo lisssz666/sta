@@ -22,6 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="foul"    column="foul"    />
         <result property="shoot"    column="shoot"    />
         <result property="cover"    column="cover"    />
+        <result property="dotTime"    column="dotTime"    />
         <result property="hitRate"    column="hit_rate"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
@@ -33,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectStaPlayerStatisticVo">
-        select id, player_id, compeid, score, backboard, assist, shoot_the_ball, trisection, free_throw, tackle, block_shot, mistake, foul,shoot,cover, hit_rate, create_by, create_time, update_by, update_time from sta_player_statistic
+        select id,jersey_number, player_id, compeid, score, backboard, assist, shoot_the_ball, trisection, free_throw, tackle, block_shot, mistake, foul,shoot,cover,dotTime, hit_rate, create_by, create_time, update_by, update_time from sta_player_statistic
     </sql>
 
     <select id="selectStaPlayerStatisticList" resultMap="StaPlayerStatisticResult">
@@ -189,6 +190,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="hitRate != null">hit_rate = #{hitRate},</if>
             <if test="shoot != null">shoot = #{shoot},</if>
             <if test="cover != null">cover = #{cover},</if>
+            <if test="dotTime != null">dotTime = #{dotTime},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

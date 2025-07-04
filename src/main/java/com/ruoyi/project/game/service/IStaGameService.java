@@ -43,7 +43,7 @@ public interface IStaGameService
      * @param staGame 比赛信息
      * @return 结果
      */
-    public int updateStaGame(StaGame staGame);
+    public AjaxResult updateStaGame(StaGame staGame) throws Exception;
 
     /**
      * 批量删除比赛信息

@@ -3,6 +3,8 @@ package com.ruoyi.project.video.controller;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,10 @@ public class StaVideoController extends BaseController
 {
     @Autowired
     private IStaVideoService staVideoService;
+
+    //文件上传路径
+    @Value("${spring.upload.videopath}")
+    private String uploadPath;
 
     /**
      * 查询视频录像文件列表
@@ -92,7 +98,10 @@ public class StaVideoController extends BaseController
     // 合并比赛视频
     @PostMapping("/fullPlayBlack")
     public AjaxResult fullPlayBlack(@RequestParam("leagueId") String leagueId,
-                                    @RequestParam("gameId") String gameId) throws Exception {
-        return staVideoService.fullPlayBlack(leagueId, gameId);
+                                           @RequestParam("gameId") String gameId) throws Exception {
+        AjaxResult result = staVideoService.fullPlayBlack(leagueId, gameId);
+        Object msg = result.get("msg");
+        result.put("msg",uploadPath+msg);
+        return result;
     }
 }

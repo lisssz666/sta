@@ -1,21 +1,14 @@
 package com.ruoyi.project.statistic.service.impl;
 
-import java.sql.Wrapper;
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.game.domain.StaGame;
 import com.ruoyi.project.game.mapper.StaGameMapper;
 import com.ruoyi.project.game.service.impl.StaGameServiceImpl;
-import com.ruoyi.project.match.domain.StaLeagueMatch;
-import com.ruoyi.project.match.mapper.StaLeagueMatchMapper;
-import com.ruoyi.project.player.domain.StaPlayer;
 import com.ruoyi.project.player.mapper.StaPlayerMapper;
 import com.ruoyi.project.rank.service.impl.StaTeamRankingServiceImpl;
 import org.slf4j.Logger;
@@ -599,7 +592,8 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
             //快攻
             if (staPlayerStatistic.getBlockShot() != null) {
                 playerStatistic1.setBlockShot((playerStatistic.getBlockShot() !=null ? playerStatistic.getBlockShot():0) + staPlayerStatistic.getBlockShot());
-            }//失误
+            }
+            //失误
             if (staPlayerStatistic.getMistake() != null) {
                 playerStatistic1.setMistake((playerStatistic.getMistake() !=null ? playerStatistic.getMistake(): 0)+ staPlayerStatistic.getMistake());
             }
@@ -611,15 +605,33 @@ public class StaPlayerStatisticServiceImpl implements IStaPlayerStatisticService
                 int denominator = Integer.parseInt(parts[1]);
                 // 浮点数除法
                 double result = (double) numerator / denominator;
-                //指定保留一位小数的格式
-//                double roundedNumber = Math.round(result * 10.0) / 10.0;
                 // 创建百分比格式化对象，保留一位小数
                 DecimalFormat decimalFormat = new DecimalFormat("0%");
-
                 // 格式化百分比
                 String formattedPercentage = decimalFormat.format(result);
                 playerStatistic1.setHitRate(formattedPercentage);
             }
+        //打点得分时间记录，用于做个人集锦 staPlayerStatistic：传过来的；playerStatistic查数据库的
+        String newDotTime = staPlayerStatistic.getDotTime();
+        if (newDotTime != null && !newDotTime.isEmpty()) {
+            // 获取 playerStatistic 中的 dotTime
+            String existingDotTime = playerStatistic.getDotTime();
+            // 使用 StringBuilder 来构建最终的 dotTimeData 字符串
+            StringBuilder dotTimeDataBuilder = new StringBuilder();
+            // 如果 existingDotTime 不为空，则将其添加到结果中
+            if (existingDotTime != null && !existingDotTime.isEmpty()) {
+                dotTimeDataBuilder.append(existingDotTime);
+            }
+            // 如果 existingDotTime 不为空，先添加一个逗号分隔符
+            if (dotTimeDataBuilder.length() > 0) {
+                dotTimeDataBuilder.append(",");
+            }
+            dotTimeDataBuilder.append(newDotTime);
+            // 设置最终的 dotTime 到 playerStatistic1
+            String finalDotTimeData = dotTimeDataBuilder.toString();
+
+            playerStatistic1.setDotTime(finalDotTimeData);
+        }
         //暂停(只修改比赛，与球员统计无关，所以用if)
         if(staPlayerStatistic.getPaused() != null){
             int paused = staPlayerStatistic.getPaused();

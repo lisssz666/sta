@@ -3,6 +3,8 @@ package com.ruoyi.project.video.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -26,40 +28,20 @@ public class StaVideo extends BaseEntity
     private Long id;
 
     /** 文件名称 */
-    @Excel(name = "文件名称")
     private String fileName;
 
     /** 文件路径 */
-    @Excel(name = "文件路径")
     private String filePath;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
+    /** 联赛id */
+    @JsonIgnore
+    private String leagueId;
 
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setFileName(String fileName) 
-    {
-        this.fileName = fileName;
-    }
+    /** 比赛id */
+    @JsonIgnore
+    private String gameId;
 
-    public String getFileName() 
-    {
-        return fileName;
-    }
-    public void setFilePath(String filePath) 
-    {
-        this.filePath = filePath;
-    }
-
-    public String getFilePath() 
-    {
-        return filePath;
-    }
-
+    /** 文件类型 */
+    private int type;
 
 }

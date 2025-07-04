@@ -12,6 +12,9 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.game.domain.StaGame;
+import com.ruoyi.project.game.mapper.StaGameMapper;
+import com.ruoyi.project.video.clip.VideoProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +39,13 @@ public class StaVideoServiceImpl implements IStaVideoService
     private static final Logger log = LoggerFactory.getLogger(StaVideoServiceImpl.class);
 
     @Autowired
+    private StaGameMapper staGameMapper;
+
+    @Autowired
     private StaVideoMapper staVideoMapper;
+
+    @Autowired
+    private VideoProcessor videoProcessor;
 
     //文件上传路径
     @Value("${spring.upload.videopath}")
@@ -78,7 +87,22 @@ public class StaVideoServiceImpl implements IStaVideoService
     @Override
     public List<StaVideo> selectStaVideoList(StaVideo staVideo)
     {
+        String gameId = staVideo.getGameId();
+        if (gameId != null) {
+            StaGame staGame = staGameMapper.selectStaGameById(Long.valueOf(staVideo.getGameId()));
+            if (staGame == null){
+                return null;
+            }
+            Integer gameStage = staGame.getGameStatus();
+            // gameStage = 13 是比赛结束状态
+            if (gameStage != null && gameStage == 13) {
+                staVideo.setType(2); // 合并视频
+            } else {
+                staVideo.setType(1); // 比赛片段视频
+            }
+        }
         List<StaVideo> staVideos = staVideoMapper.selectStaVideoList(staVideo);
+
         staVideos.forEach(filePath -> filePath.setFilePath(serverPath+filePath.getFilePath()));
         return staVideos;
     }
@@ -150,6 +174,10 @@ public class StaVideoServiceImpl implements IStaVideoService
             StaVideo staVideo = new StaVideo();
             staVideo.setFilePath(result);
             staVideo.setFileName(file.getOriginalFilename());
+            //1比赛中的分段视频
+            staVideo.setType(1);
+            staVideo.setLeagueId(leagueId);
+            staVideo.setGameId(gameId);
             staVideoMapper.insertStaVideo(staVideo);
             result = serverPath+result;
             return result;
@@ -173,7 +201,7 @@ public class StaVideoServiceImpl implements IStaVideoService
             return AjaxResult.error("视频目录不存在: " + videoDir);
         }
 
-        // 2. 获取有序视频文件列表
+        // 2. 获取有序视频文件列表（已按时间戳数值排序）
         List<Path> videoFiles;
         try {
             videoFiles = getAllMp4Files(videoDir);
@@ -207,18 +235,46 @@ public class StaVideoServiceImpl implements IStaVideoService
         } finally {
             cleanupTempFile(fileListPath);
         }
-
-        return AjaxResult.success(serverPath + outputVideo.toString().replace(File.separator, "/"));
+        String fullPath = outputVideo.toString().replace(File.separator, "/");
+        //将合并的视频地址存到数据库
+        StaVideo staVideo = new StaVideo();
+        staVideo.setType(2);
+        staVideo.setLeagueId(leagueId);
+        staVideo.setGameId(gameId);
+        staVideo.setFilePath(fullPath);
+        staVideoMapper.insertStaVideo(staVideo);
+        return AjaxResult.success(fullPath);
     }
 
     private List<Path> getAllMp4Files(Path directory) throws IOException {
         try (Stream<Path> paths = Files.list(directory)) {
             return paths
                     .filter(path -> path.toString().toLowerCase().endsWith(".mp4"))
-                    .sorted(Comparator.comparing(Path::getFileName))
+                    //方法会按照文件名中第一个 _ 之前的部分（假设是数字）进行排序，忽略 _ 及其后面的所有字符
+                    .sorted(Comparator.comparing(path -> {
+                        String fileName = path.getFileName().toString();
+                        // 去掉文件扩展名
+                        String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+                        int underscoreIndex = baseName.indexOf('_');
+                        String timestampStr = underscoreIndex == -1 ? baseName : baseName.substring(0, underscoreIndex);
+                        try {
+                            return Long.parseLong(timestampStr);
+                        } catch (NumberFormatException e) {
+                            return 0L; // 处理解析失败（根据需求调整）
+                        }
+                    }))
                     .collect(Collectors.toList());
         }
     }
+    /*private List<Path> getAllMp4Files(Path directory) throws IOException {
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths
+                    .filter(path -> path.toString().toLowerCase().endsWith(".mp4"))
+                    .sorted(Comparator.comparing(Path::getFileName))
+                    .collect(Collectors.toList());
+        }
+    }*/
+
 
     private void generateFileList(Path fileListPath, List<Path> videoFiles) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(fileListPath)) {
@@ -280,21 +336,4 @@ public class StaVideoServiceImpl implements IStaVideoService
         }
     }
 
-    // 递归获取所有MP4文件
-    private List<File> getAllMp4Files(File directory) {
-        List<File> mp4Files = new ArrayList<>();
-        if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        mp4Files.addAll(getAllMp4Files(file));
-                    } else if (file.getName().toLowerCase().endsWith(".mp4")) {
-                        mp4Files.add(file);
-                    }
-                }
-            }
-        }
-        return mp4Files;
-    }
 }

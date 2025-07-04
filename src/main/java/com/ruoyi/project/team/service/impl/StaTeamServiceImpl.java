@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.project.player.domain.StaPlayer;
+import com.ruoyi.project.player.mapper.StaPlayerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,9 @@ public class StaTeamServiceImpl implements IStaTeamService
 
     @Autowired
     private StaTeamMapper staTeamMapper;
+
+    @Autowired
+    private StaPlayerMapper staPlayerMapper;
 
     /**
      * 查询球队信息
@@ -92,6 +97,12 @@ public class StaTeamServiceImpl implements IStaTeamService
                 staTeam.setTeamLogoPath(teamLogoPath);
             }
             staTeamMapper.insertStaTeam(staTeam);
+            //默认添加一个“其他”球员
+            StaPlayer staPlayer = new StaPlayer();
+            staPlayer.setTeamId(staTeam.getId());
+            staPlayer.setJerseyNumber(100);
+            staPlayer.setName("其他");
+            staPlayerMapper.insertStaPlayer(staPlayer);
             return staTeam.getId();
         }
         catch (Exception e)
