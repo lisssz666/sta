@@ -52,8 +52,11 @@ public class StaTeamServiceImpl implements IStaTeamService
     {
         return Optional.ofNullable(staTeamMapper.selectStaTeamById(id))
                 .map(staTeam -> {
-                    String logoPath = staTeam.getTeamLogoPath();
-                    staTeam.setTeamLogoPath(server + logoPath);
+                    if (staTeam.getTeamLogoPath() != null && !staTeam.getTeamLogoPath().isEmpty()) {
+                        staTeam.setTeamLogoPath(server + staTeam.getTeamLogoPath());
+                    }if (staTeam.getTeamPhotoPath() != null && !staTeam.getTeamPhotoPath().isEmpty()) {
+                        staTeam.setTeamPhotoPath(server + staTeam.getTeamPhotoPath());
+                    }
                     return staTeam;
                 })
                 .orElse(null);
@@ -89,12 +92,19 @@ public class StaTeamServiceImpl implements IStaTeamService
     public Long insertStaTeam(StaTeam staTeam) throws IOException {
         staTeam.setCreateTime(DateUtils.getNowDate());
         MultipartFile teamLogo = staTeam.getTeamLogo();
+        MultipartFile teamPhoto = staTeam.getTeamPhoto();
         try {
-            if (staTeam.getTeamLogo() !=null && !staTeam.getTeamLogo().isEmpty())
+            if (teamLogo !=null && !teamLogo.isEmpty())
             {
                 //上传logo
                 String teamLogoPath = FileUploadUtils.upload(uploadImgPath, teamLogo);
                 staTeam.setTeamLogoPath(teamLogoPath);
+            }
+            if (teamPhoto !=null && !teamPhoto.isEmpty())
+            {
+                //上传球队照片
+                String teamPhotoPath = FileUploadUtils.upload(uploadImgPath, teamPhoto);
+                staTeam.setTeamPhotoPath(teamPhotoPath);
             }
             staTeamMapper.insertStaTeam(staTeam);
             //默认添加一个“其他”球员

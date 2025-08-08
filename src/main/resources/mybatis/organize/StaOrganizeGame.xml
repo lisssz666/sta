@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.game.organize.mapper.StaOrganizeGameMapper">
+    <resultMap type="StaOrganizeGameEntity" id="StaOrganizeGameResult">
+        <result property="id"              column="id"/>
+        <result property="teamId"          column="team_id"/>
+        <result property="teamName"        column="team_name"/>
+        <result property="gameDate"        column="game_date"/>
+        <result property="gameTime"        column="game_time"/>
+        <result property="uniform"         column="uniform"/>
+        <result property="fee"             column="fee"/>
+        <result property="referee"         column="referee"/>
+        <result property="level"           column="level"/>
+        <result property="venue"           column="venue"/>
+        <result property="contact"         column="contact"/>
+        <result property="remark"          column="remark"/>
+        <result property="createBy"        column="create_by"/>
+        <result property="createTime"      column="create_time"/>
+        <result property="updateBy"        column="update_by"/>
+        <result property="updateTime"      column="update_time"/>
+    </resultMap>
+    <!-- 基础字段 -->
+    <sql id="Base_Column_List">
+        id, team_id, team_name, game_date, game_time, uniform,
+        fee, referee, level, venue, contact, remark,
+        create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectAllList"  parameterType="StaOrganizeGameEntity" resultMap="StaOrganizeGameResult" >
+        SELECT <include refid="Base_Column_List"/>
+        FROM sta_organize_game
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="StaOrganizeGameEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sta_organize_game
+        (team_id, team_name, game_date, game_time, uniform,
+        fee, referee, level, venue, contact, remark,
+        create_by, create_time, update_by, update_time)
+        VALUES
+        (#{teamId}, #{teamName}, #{gameDate}, #{gameTime}, #{uniform},
+        #{fee}, #{referee}, #{level}, #{venue}, #{contact}, #{remark},
+        #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM sta_organize_game WHERE id = #{id}
+    </delete>
+
+</mapper>

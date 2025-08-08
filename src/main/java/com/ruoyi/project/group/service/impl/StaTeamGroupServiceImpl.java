@@ -68,6 +68,8 @@ public class StaTeamGroupServiceImpl implements StaTeamGroupService {
                         .map(team -> {
                             if (team.getTeamLogoPath() != null && !team.getTeamLogoPath().isEmpty()) {
                                 team.setTeamLogoPath(server + team.getTeamLogoPath());
+                            }if (team.getTeamPhoto() != null && !team.getTeamPhoto().isEmpty()) {
+                                team.setTeamPhotoPath(server + team.getTeamPhotoPath());
                             }
                             return team;
                         })

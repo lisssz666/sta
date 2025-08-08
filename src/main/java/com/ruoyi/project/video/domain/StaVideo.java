@@ -41,6 +41,10 @@ public class StaVideo extends BaseEntity
     @JsonIgnore
     private String gameId;
 
+    /** 球队id */
+    @JsonIgnore
+    private String teamId;
+
     /** 文件类型 */
     private int type;
 

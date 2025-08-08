@@ -33,6 +33,12 @@ public class StaTeam extends BaseEntity {
     /** 球队logo 路径*/
     private String teamLogoPath;
 
+    /** 球队照片 */
+    private MultipartFile teamPhoto;
+
+    /** 球队照片 路径*/
+    private String teamPhotoPath;
+
     /** 领队名字 */
     private String leaderName;
 

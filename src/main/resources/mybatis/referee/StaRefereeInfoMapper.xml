@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.referee.mapper.StaRefereeInfoMapper">
+    <resultMap type="com.ruoyi.project.referee.domain.StaRefereeInfoEntity" id="StaRefereeInfoResult">
+        <result property="id"         column="id"/>
+        <result property="name"       column="name"/>
+        <result property="avatarPath"     column="avatar"/>
+        <result property="level"      column="level"/>
+        <result property="certDate"   column="cert_date"/>
+        <result property="regUnit"    column="reg_unit"/>
+        <result property="signature"  column="signature"/>
+        <result property="status"     column="status"/>
+        <result property="remark"     column="remark"/>
+        <result property="refereeYears" column="referee_years"/>
+        <result property="price" column="price"/>
+        <result property="orderCount" column="order_count"/>
+        <result property="scheduleLog" column="schedule_log"/>
+        <result property="createBy"   column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy"   column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,avatar,level,cert_date,reg_unit,signature,status,
+        remark,referee_years,price,order_count,schedule_log,
+        create_by,create_time,update_by,update_time
+    </sql>
+
+    <select id="selectAllList" parameterType="com.ruoyi.project.referee.domain.StaRefereeInfoEntity"
+            resultMap="StaRefereeInfoResult">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sta_referee_info
+        <where>
+            <if test="name != null and name != ''">AND name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="level != null and level != ''">AND level = #{level}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectById" parameterType="long" resultMap="StaRefereeInfoResult">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sta_referee_info WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.project.referee.domain.StaRefereeInfoEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sta_referee_info
+        (name, avatar, level, cert_date, reg_unit, signature, status,
+        remark, referee_years,price,order_count, schedule_log,
+        create_by, create_time, update_by, update_time)
+        VALUES
+        (#{name}, #{avatarPath}, #{level}, #{certDate}, #{regUnit}, #{signature}, #{status},
+        #{remark}, #{refereeYears},#{price},#{orderCount}, #{scheduleLog},
+        #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
+    </insert>
+
+    <update id="updateById" parameterType="com.ruoyi.project.referee.domain.StaRefereeInfoEntity">
+        UPDATE sta_referee_info
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="certDate != null">cert_date = #{certDate},</if>
+            <if test="regUnit != null">reg_unit = #{regUnit},</if>
+            <if test="signature != null">signature = #{signature},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="refereeYears != null">referee_years = #{refereeYears},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="orderCount != null">order_count = #{orderCount},</if>
+            <if test="scheduleLog != null">schedule_log = #{scheduleLog},</if>
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM sta_referee_info WHERE id = #{id}
+    </delete>
+</mapper>

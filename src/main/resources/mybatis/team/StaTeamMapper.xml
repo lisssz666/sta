@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="id"          column="id"/>
         <result property="teamTitle"   column="team_title"/>
         <result property="teamLogoPath"    column="team_logo"/>
+        <result property="teamPhotoPath"    column="team_photo"/>
         <result property="leaderName"  column="leader_name"/>
         <result property="leaderPhone" column="leader_phone"/>
         <result property="city"        column="city"/>
@@ -20,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectStaTeamVo">
-    select id, team_title, team_logo, leader_name, leader_phone, city, home_color, away_color, create_by, create_time, update_by, update_time
+    select id, team_title, team_logo, team_photo, leader_name, leader_phone, city, home_color, away_color, create_by, create_time, update_by, update_time
     from sta_team
 </sql>
 
@@ -44,6 +45,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="teamTitle != null">team_title,</if>
             <if test="teamLogoPath != null">team_logo,</if>
+            <if test="teamPhotoPath != null">team_photo,</if>
             <if test="leaderName != null">leader_name,</if>
             <if test="leaderPhone != null">leader_phone,</if>
             <if test="city != null">city,</if>
@@ -57,6 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="teamTitle != null">#{teamTitle},</if>
             <if test="teamLogoPath != null">#{teamLogoPath},</if>
+            <if test="teamPhotoPath != null">#{teamPhotoPath},</if>
             <if test="leaderName != null">#{leaderName},</if>
             <if test="leaderPhone != null">#{leaderPhone},</if>
             <if test="city != null">#{city},</if>

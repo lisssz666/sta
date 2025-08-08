@@ -88,15 +88,12 @@ ADD COLUMN away_fouls INT,
 ADD COLUMN hsessions_score VARCHAR(255),
 ADD COLUMN asessions_score VARCHAR(255);
 
-
-
-
-
 drop table if exists sta_team;
 CREATE TABLE sta_team (
     id BIGINT AUTO_INCREMENT COMMENT 'id',
     team_title VARCHAR(255) COMMENT '球队名称',
 		team_logo VARCHAR(255) COMMENT '球队logo',
+		team_photo VARCHAR(255) COMMENT '球队合照',
 		leader_name VARCHAR(255) COMMENT '领队',
 		leader_phone VARCHAR(255) COMMENT '领队电话',
 		city VARCHAR(255) COMMENT '所属城市',
@@ -213,10 +210,10 @@ CREATE TABLE sta_team_group (
     league_id BIGINT NOT NULL COMMENT '联赛ID',
     group_name VARCHAR(255) NOT NULL COMMENT '分组名称',
     team_ids varchar(255) NOT NULL COMMENT '分组里的球队ID，使用JSON字段存储',
-		create_by   varchar(64)     default '' comment '创建者',
-		create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
-		update_by  varchar(64)     default ''  comment '更新者',
-		update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间'
+    create_by   varchar(64)     default '' comment '创建者',
+    create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
+    update_by  varchar(64)     default ''  comment '更新者',
+    update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间'
 ) COMMENT '球队分组表';
 
 drop table if exists sta_team_ranking;
@@ -287,6 +284,7 @@ CREATE TABLE `sta_video`  (
   `file_path` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '文件路径',
   `league_id` bigint(20) NULL DEFAULT NULL COMMENT '联赛id',
   `game_id` bigint(20) NULL DEFAULT NULL COMMENT '比赛id',
+  `team_id` bigint(20) NULL DEFAULT NULL COMMENT '球队id',
   `type` tinyint(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '比赛类型  1比赛片段视频，2合并视频',
   `create_by` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT '' COMMENT '创建者',
     `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -294,5 +292,145 @@ CREATE TABLE `sta_video`  (
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 337 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '视频录像文件表' ROW_FORMAT = Dynamic;
-
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+DROP TABLE IF EXISTS `sta_organize_game`;
+CREATE TABLE `sta_organize_game` (
+  `id`          bigint(20)   NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `team_id`     bigint(20)   DEFAULT NULL COMMENT '球队id',
+  `team_name`   varchar(64)  NOT NULL COMMENT '球队名称',
+  `game_date`   date         DEFAULT NULL COMMENT '比赛日期',
+  `game_time`   varchar(32)  DEFAULT NULL COMMENT '比赛时间段',
+  `uniform`     varchar(32)  DEFAULT NULL COMMENT '球服颜色',
+  `fee`         varchar(32)  DEFAULT NULL COMMENT '费用',
+  `referee`     varchar(32)  DEFAULT NULL COMMENT '裁判',
+  `level`       varchar(32)  DEFAULT NULL COMMENT '水平描述',
+  `venue`       varchar(255) DEFAULT NULL COMMENT '场地',
+  `contact`     varchar(255) DEFAULT NULL COMMENT '联系方式',
+  `remark`      varchar(255) DEFAULT NULL COMMENT '备注',
+  `create_by`   varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time` timestamp    NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by`   varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` timestamp    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='球队约球信息表';
+
+CREATE TABLE `sta_referee_info` (
+  `id`          bigint(20)   NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name`        varchar(64)  NOT NULL COMMENT '姓名',
+  `avatar`      varchar(255) DEFAULT NULL COMMENT '裁判头像',
+  `level`       varchar(32)  DEFAULT NULL COMMENT '等级',
+  `cert_date`   date         DEFAULT NULL COMMENT '获证日期',
+  `reg_unit`    varchar(128) DEFAULT NULL COMMENT '注册单位',
+  `signature`   varchar(255) DEFAULT NULL COMMENT '个性签名',
+  `status`      char(1)      DEFAULT '1' COMMENT '状态 1正常 0停用',
+  `remark`      varchar(255) DEFAULT NULL COMMENT '备注',
+  `order_count` int(11)      DEFAULT 0 COMMENT '订单数',
+  `schedule_log` text         COMMENT '排班记录(JSON)',
+  `create_by`   varchar(64)  DEFAULT '' COMMENT '创建者',
+	 create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by`   varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time` DATETIME    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='裁判信息表';
+
+ALTER TABLE sta_referee_info
+  ADD COLUMN referee_years INT DEFAULT 0 COMMENT '执裁年限(年)',
+  ADD COLUMN price VARCHAR(32) DEFAULT '0' COMMENT '价格(字符串)';
+
+================================================商城=========================================================================
+
+-- 商位表
+CREATE TABLE mall_merchant (
+  id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  name          VARCHAR(64)  NOT NULL COMMENT '摊位名称',
+  address       VARCHAR(255)  COMMENT '摊位地址',
+  phone         VARCHAR(20)   COMMENT '联系电话',
+  open_time     VARCHAR(32)   COMMENT '营业时段 如18:00-01:00',
+  status        TINYINT(1) DEFAULT 1 COMMENT '营业状态 1营业 0停业',
+  cover_img     VARCHAR(255) COMMENT '封面图URL',
+  score         VARCHAR(20)  COMMENT '评分',
+  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商位表';
+-- 追加字段
+ALTER TABLE mall_merchant
+    ADD COLUMN comment_num  INT          DEFAULT 0 COMMENT '评论数',
+    ADD COLUMN category     VARCHAR(32)  COMMENT '经营类别',
+    ADD COLUMN distance_km  VARCHAR(32) COMMENT '距离(km)',
+    ADD COLUMN parking      VARCHAR(32)   DEFAULT 0 COMMENT '停车便利',
+    ADD COLUMN open_day     VARCHAR(10)   DEFAULT 0 COMMENT '24小时营业',
+    ADD COLUMN rank_text    VARCHAR(64)  COMMENT '榜单描述';
+    ADD COLUMN address_abbr VARCHAR(32) COMMENT '地址简称' AFTER address;
+    ADD COLUMN slogan       VARCHAR(100) COMMENT '商品标语' AFTER name,
+    ADD COLUMN sales_tag    VARCHAR(20)  COMMENT '销量标签' AFTER month_sales,
+    ADD COLUMN stock        VARCHAR(10)  DEFAULT '0' COMMENT '库存数量（字符串）' AFTER price,
+    ADD COLUMN discount     VARCHAR(5)   DEFAULT '1' COMMENT '折扣系数字符串，如 0.88' AFTER discount_price;
+    ADD COLUMN deleted TINYINT(1) DEFAULT 0 COMMENT '逻辑删除 0未删 1已删';
+    ADD COLUMN delivery_type VARCHAR(10) DEFAULT '外卖' COMMENT '到店/外卖/其他';
+    ADD COLUMN merchant_logo VARCHAR(255) COMMENT '商位logo（URL或路径）';
+
+
+-- 顺手建几个常用的索引
+ALTER TABLE mall_merchant
+    ADD INDEX idx_category (category),
+    ADD INDEX idx_distance (distance_km);
+
+
+-- 商品表
+CREATE TABLE mall_product (
+  id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  merchant_id   BIGINT NOT NULL COMMENT '所属商位ID',
+  name          VARCHAR(100) NOT NULL COMMENT '商品名称',
+  cover_img     VARCHAR(255) COMMENT '商品图',
+  price         DECIMAL(8,2) NOT NULL COMMENT '原价',
+  discount_price DECIMAL(8,2) COMMENT '折扣价',
+  month_sales   INT DEFAULT 0 COMMENT '月售',
+  status        TINYINT(1) DEFAULT 1 COMMENT '上架状态',
+  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_merchant (merchant_id),
+  INDEX idx_status (status),
+  CONSTRAINT fk_product_merchant FOREIGN KEY (merchant_id) REFERENCES mall_merchant(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+
+ALTER TABLE mall_product ADD COLUMN deleted TINYINT(1) DEFAULT 0 COMMENT '逻辑删除';
+
+-- 订单表
+CREATE TABLE mall_order (
+  id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '订单主键',
+  order_no      VARCHAR(64)  NOT NULL COMMENT '订单号（唯一）',
+  user_id       BIGINT       NOT NULL COMMENT '下单用户ID',
+  total_amount  DECIMAL(10,2) NOT NULL COMMENT '订单实付总额',
+  address       VARCHAR(255) NOT NULL COMMENT '送餐地址',
+  phone         VARCHAR(20)  NOT NULL COMMENT '手机号',
+  remark        VARCHAR(255) COMMENT '备注',
+  status        TINYINT(1) DEFAULT 0 COMMENT '0待支付 1已支付 2已取消',
+  deleted       TINYINT(1) DEFAULT 0 COMMENT '逻辑删除',
+  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order_no (order_no),
+  INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
+
+ALTER TABLE mall_order   ADD COLUMN merchant_id BIGINT NULL COMMENT '商位ID';
+
+
+CREATE TABLE mall_order_item (
+  id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '明细主键',
+  order_id      BIGINT NOT NULL COMMENT '订单主表ID',
+  product_id    BIGINT NOT NULL COMMENT '商品ID',
+  product_name  VARCHAR(100) NOT NULL COMMENT '商品快照名称',
+  quantity      INT DEFAULT 1 COMMENT '购买数量',
+  unit_price    DECIMAL(8,2) NOT NULL COMMENT '商品当时单价',
+  total_price   DECIMAL(8,2) NOT NULL COMMENT '本行小计',
+  deleted       TINYINT(1) DEFAULT 0 COMMENT '逻辑删除',
+  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_order_id (order_id),
+  INDEX idx_product_id (product_id),
+  CONSTRAINT fk_item_order  FOREIGN KEY (order_id)   REFERENCES mall_order(id),
+  CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES mall_product(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单明细表';

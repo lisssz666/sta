@@ -20,11 +20,11 @@ server:
   # 服务器的HTTP端口，默认为8080
 #  port: 8094
   port: 8088
-#  ssl:
-#    key-store: classpath:ybyoulan.cn.pfx
-#    key-store-type: PKCS12
-#    key-store-password: 3n6nw30sf15
-#    key-alias: ybyoulan.cn
+  ssl:
+    key-store: classpath:ybyoulan.cn.pfx
+    key-store-type: PKCS12
+    key-store-password: 3n6nw30sf15
+    key-alias: ybyoulan.cn
   servlet:
     # 应用的访问路径
     context-path: /
@@ -68,16 +68,16 @@ spring:
 #    ffmpeg: /Users/lisenshuai/ffmpeg/ffmpeg
 
     #开发环境-windown电脑
-    server: http://127.0.0.1:8088
-    path: D:/文件/图片文件/
-    videopath: D:/文件/视频文件/
-    ffmpeg: C:\Users\47232\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe
+#    server: http://127.0.0.1:8088
+#    path: D:/文件/图片文件/
+#    videopath: D:/文件/视频文件/
+#    ffmpeg: C:\Users\47232\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe
 
     #正式环境
-#    server: http://114.132.162.213
-#    path: /home/web/dist/yinbo/img
-#    videopath: /home/web/dist/yinbo/video/
-#    ffmpeg: /usr/bin/ffmpeg
+    server: http://114.132.162.213
+    path: /home/web/dist/yinbo/img
+    videopath: /home/web/dist/yinbo/video/
+    ffmpeg: /usr/bin/ffmpeg
   # 服务模块
   devtools:
     restart:

@@ -93,16 +93,18 @@ public class StaVideoServiceImpl implements IStaVideoService
             if (staGame == null){
                 return null;
             }
+            int type = staVideo.getType();
             Integer gameStage = staGame.getGameStatus();
-            // gameStage = 13 是比赛结束状态
-            if (gameStage != null && gameStage == 13) {
-                staVideo.setType(2); // 合并视频
-            } else {
-                staVideo.setType(1); // 比赛片段视频
+            if (type == 0) {
+                // gameStage = 13 是比赛结束状态，比赛结束返回合并视频
+                if (gameStage != null && gameStage == 13) {
+                    staVideo.setType(2); // 合并视频
+                } else {
+                    staVideo.setType(1); // 比赛片段视频
+                }
             }
         }
         List<StaVideo> staVideos = staVideoMapper.selectStaVideoList(staVideo);
-
         staVideos.forEach(filePath -> filePath.setFilePath(serverPath+filePath.getFilePath()));
         return staVideos;
     }

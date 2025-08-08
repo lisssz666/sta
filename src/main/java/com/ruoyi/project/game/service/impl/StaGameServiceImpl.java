@@ -366,11 +366,13 @@ public class StaGameServiceImpl implements IStaGameService
             e.printStackTrace();
         }
         for (StaPlayerStatistic statistic : staPlayerStatistics) {
-            Integer jerseyNumber = statistic.getJerseyNumber();
-            System.out.println("jerseyNumber=== "+jerseyNumber);
+            Long teamId = statistic.getTeamId();  //球队id
+            Integer jerseyNumber = Optional.ofNullable(statistic.getJerseyNumber()).orElse(100);  //球衣号码
+            String nameNum = Optional.ofNullable(statistic.getNameNum()).orElse("其他") + "/" + jerseyNumber;  //球员姓名
+            System.out.println("nameNum=== "+nameNum);
             Long score = statistic.getScore();
-            // 得分超过15分才有集锦
-            if (score > 15) {
+            // 得分超过10分才有集锦
+            if (score > 10) {
                 String dotTimeMap = statistic.getDotTime();
                 if (dotTimeMap != null && !dotTimeMap.isEmpty()) {
                     String[] times = dotTimeMap.split(",");
@@ -383,7 +385,7 @@ public class StaGameServiceImpl implements IStaGameService
                     }
                     if (videoUrl != null) {
                         // 调用 createHighlightVideo 方法，传入 multipartFile 和 goalTimes
-                        videoProcessor.createHighlightVideo(videoUrl, goalTimes, leagueId.toString(), gameId.toString(),jerseyNumber);
+                        videoProcessor.createHighlightVideo(videoUrl, goalTimes, leagueId.toString(), gameId.toString(),jerseyNumber,nameNum,teamId);
                     }
                 }
             }

@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="filePath"    column="file_path"    />
         <result property="leagueId"    column="league_id"    />
         <result property="gameId"    column="game_id"    />
+        <result property="teamId"    column="team_id"    />
         <result property="type"    column="type"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
@@ -18,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectStaVideoVo">
-        select id, file_name, file_path,league_id, game_id, type, create_by, create_time, update_by, update_time from sta_video
+        select id, file_name, file_path,league_id, game_id,team_id, type, create_by, create_time, update_by, update_time from sta_video
     </sql>
 
     <select id="selectStaVideoList" parameterType="StaVideo" resultMap="StaVideoResult">
@@ -28,6 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="filePath != null  and filePath != ''"> and file_path = #{filePath}</if>
             <if test="leagueId != null  and leagueId != ''"> and league_id = #{leagueId}</if>
             <if test="gameId != null  and gameId != ''"> and game_id = #{gameId}</if>
+            <if test="teamId != null  and teamId != ''"> and team_id = #{teamId}</if>
             <if test="type != null  and type != ''"> and type = #{type}</if>
         </where>
         <choose>
@@ -53,6 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="type != null">type,</if>
             <if test="leagueId != null">league_id,</if>
             <if test="gameId != null">game_id,</if>
+            <if test="teamId != null">team_id,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -64,6 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="type != null">#{type},</if>
             <if test="leagueId != null">#{leagueId},</if>
             <if test="gameId != null">#{gameId},</if>
+            <if test="team_id != null">#{teamId},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>

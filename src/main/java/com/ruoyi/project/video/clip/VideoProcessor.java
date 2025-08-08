@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +50,7 @@ public class VideoProcessor {
     private String FFMPEG_PATH;
 
     // 合并完视频-生成个人集锦视频
-    public String createHighlightVideo(String videoPath, List<Integer> goalTimes, String leagueId, String gameId,Integer playerId) {
+    public String createHighlightVideo(String videoPath, List<Integer> goalTimes, String leagueId, String gameId,Integer playerId,String nameNum,Long teamId) {
         try {
             System.out.println("goalTimes :" +goalTimes);
             System.out.println("videoPath :" +videoPath);
@@ -70,9 +71,12 @@ public class VideoProcessor {
             //将每个人的个人集锦视频地址存到数据库
             StaVideo staVideo = new StaVideo();
             staVideo.setType(3);
-            staVideo.setLeagueId(leagueId);
-            staVideo.setGameId(gameId);
+            staVideo.setLeagueId(leagueId);  //联赛id
+            staVideo.setGameId(gameId);  //比赛id
+            String teamIdStr = Optional.ofNullable(teamId).map(Object::toString).orElse(null);
+            staVideo.setTeamId(teamIdStr); //球队id
             staVideo.setFilePath(highlightPath);
+            staVideo.setFileName(nameNum);
             staVideoMapper.insertStaVideo(staVideo);
 
 //            return server + Paths.get(baseDir, "highlights",playerId.toString(), "highlight.mp4").toString();
