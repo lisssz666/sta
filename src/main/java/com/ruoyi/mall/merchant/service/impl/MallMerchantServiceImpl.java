@@ -62,8 +62,29 @@ public class MallMerchantServiceImpl extends ServiceImpl<MallMerchantMapper, Mal
     }
 
     @Override
-    public boolean updateMerchantById(MallMerchant merchant) {
-        return updateById(merchant);
+    public boolean updateMerchantById(MallMerchant merchant) throws IOException {
+        MultipartFile avatar = merchant.getCoverImgFile();
+        MultipartFile logoFile = merchant.getMerchantLogoFile();
+        try {
+            if (avatar != null && !avatar.isEmpty())
+            {
+                //上传商铺背景图
+                String avatarPath = FileUploadUtils.upload(uploadImgPath, avatar);
+                merchant.setCoverImg(avatarPath);
+            }
+            if (logoFile != null && !logoFile.isEmpty())
+            {
+                //上传商铺logo
+                String logoPath = FileUploadUtils.upload(uploadImgPath, logoFile);
+                merchant.setMerchantLogo(logoPath);
+            }
+            return updateById(merchant);
+        }
+        catch (Exception e)
+        {
+            throw new IOException(e.getMessage(), e);
+        }
+
     }
 
     @Override

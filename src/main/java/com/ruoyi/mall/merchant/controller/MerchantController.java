@@ -39,7 +39,7 @@ public class MerchantController  extends BaseController {
      * 修改商位
      */
     @PutMapping("/update")
-    public AjaxResult updMerchant( MallMerchant dto) {
+    public AjaxResult updMerchant(MallMerchant dto) throws IOException{
         return AjaxResult.success(merchantService.updateMerchantById(dto));
     }
 

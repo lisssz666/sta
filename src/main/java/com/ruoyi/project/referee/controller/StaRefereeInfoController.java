@@ -31,7 +31,7 @@ public class StaRefereeInfoController extends BaseController {
     }
 
     @PostMapping("/add")
-    public AjaxResult add( StaRefereeInfoEntity entity) throws IOException {
+    public AjaxResult add(StaRefereeInfoEntity entity) throws IOException {
         return toAjax(service.save(entity) ? 1 : 0);
     }
 

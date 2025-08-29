@@ -2,14 +2,10 @@ package com.ruoyi.project.rule.match.controller;
 
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.project.rule.enroll.domain.StaEnroll;
 import com.ruoyi.project.rule.match.domain.LeagueRule;
 import com.ruoyi.project.rule.match.service.LeagueRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/leagueRules")
@@ -26,7 +22,7 @@ public class LeagueRuleController extends BaseController {
 
     // 根据ID查询记录
     @GetMapping("/leagueRulesById")
-    public AjaxResult getLeagueRuleById( Long leagueId) {
+    public AjaxResult getLeagueRuleById(Long leagueId) {
         return AjaxResult.success(leagueRuleService.getLeagueRuleById(leagueId));
     }
 

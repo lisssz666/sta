@@ -1,10 +1,12 @@
 package com.ruoyi.mall.order.controller;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.mall.merchant.domain.MallMerchant;
+import com.ruoyi.mall.merchant.service.MallMerchantService;
 import com.ruoyi.mall.order.domain.CreateOrderDTO;
 import com.ruoyi.mall.order.domain.MallOrder;
 import com.ruoyi.mall.order.domain.MallOrderItem;
-import com.ruoyi.mall.order.domain.vo.OrderDetailVO;
 import com.ruoyi.mall.order.domain.vo.OrderItemVO;
 import com.ruoyi.mall.order.domain.vo.OrderListVO;
 import com.ruoyi.mall.order.service.MallOrderItemService;
@@ -19,7 +21,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -34,9 +35,6 @@ import static com.ruoyi.framework.datasource.DynamicDataSourceContextHolder.log;
 @RequestMapping("/order")
 public class OrderController extends BaseController {
 
-    //文件上传路径
-    @Value("${spring.upload.server}")
-    private String server;
 
     @Autowired
     private  MallOrderService orderService;
@@ -44,12 +42,16 @@ public class OrderController extends BaseController {
     private MallOrderItemService itemService;
     @Autowired
     private MallProductService productService;
+    @Autowired
+    private MallMerchantService mallMerchantService; // 商品快照
+
 
     /**
      * 创建订单
      */
     @PostMapping("/create")
-    public AjaxResult create(CreateOrderDTO dto) {
+    public AjaxResult create2(@RequestBody CreateOrderDTO dto) {
+        System.out.println("dto:::: "+dto);
         return AjaxResult.success(orderService.createOrder(dto));
     }
     /**
@@ -88,6 +90,9 @@ public class OrderController extends BaseController {
         if (StringUtils.hasText(dto.getRemark())) {
             updateObj.setRemark(dto.getRemark());
         }
+        if (dto.getStatus() != null) {                 // ✅ 修改状态
+            updateObj.setStatus(dto.getStatus());
+        }
         /* 3. 执行更新（逻辑删除过滤） */
         boolean success = orderService.updateOrderById(updateObj);
         /* 4. 返回结果 */
@@ -100,15 +105,12 @@ public class OrderController extends BaseController {
      * 返回：订单主表 + 明细列表 + 商品封面绝对路径
      */
     @GetMapping("/list")
-    public AjaxResult listOrder(@RequestParam(required = false) Long merchantId) {
-        // 1. 查询订单主表
-        List<MallOrder> orders = orderService.listOrdersByMerchantId(merchantId);
-        // 2. 为每条订单补充明细 & 封面图
-        List<OrderListVO> voList = orders.stream()
-                .map(this::buildOrderListVO)
-                .collect(Collectors.toList());
-
-        return AjaxResult.success(voList);
+    public AjaxResult listOrder(@RequestParam(required = false) Long merchantId,
+                                @RequestParam(required = false) String phone,
+                                @RequestParam(required = false) String status
+                                ) {
+        List<OrderListVO>  page = orderService.listOrdersNoPage(merchantId, phone, status);
+        return AjaxResult.success(page);
     }
 
     /**
@@ -123,37 +125,32 @@ public class OrderController extends BaseController {
         if (order == null) {
             return AjaxResult.error("订单不存在");
         }
+        // 查询商家信息
+        MallMerchant merchant = mallMerchantService.getMerchantById(order.getMerchantId());
+        if (merchant == null) {
+            return AjaxResult.error("商位不存在");
+        }
         // 2. 补充明细 & 封面图
-        OrderListVO vo = buildOrderDetailVO(order);
+        OrderListVO vo = buildOrderDetailVO(order,merchant.getName());
         return AjaxResult.success(vo);
-    }
-
-    @PostMapping("/notify")
-    public String payNotify(HttpServletRequest request) throws IOException {
-        // 1. 读取请求体
-        String body = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
-        // 2. 验签、解密、业务处理...
-        log.info("收到微信支付通知：{}", body);
-        return "success";   // 必须返回 success
     }
 
     /* ------------------ 私有工具方法 ------------------ */
 
-    private OrderListVO buildOrderListVO(MallOrder order) {
+    private OrderListVO buildOrderListVO(MallOrder order, String merchantName) {
         OrderListVO vo = new OrderListVO();
         BeanUtils.copyProperties(order, vo);
-
+        vo.setMerchantName(merchantName);  // 设置商家名称
         // 明细
         List<MallOrderItem> items = itemService.listItemsByOrderId(order.getId());
         List<OrderItemVO> itemVos = items.stream()
                 .map(item -> {
                     OrderItemVO itemVo = new OrderItemVO();
                     BeanUtils.copyProperties(item, itemVo);
-
                     // 商品封面补全
                     MallProduct product = productService.getProductById(item.getProductId());
                     if (product != null && product.getCoverImg() != null) {
-                        itemVo.setCoverImg(server + product.getCoverImg());
+                        itemVo.setCoverImg(product.getCoverImg());
                     }
                     return itemVo;
                 })
@@ -162,9 +159,8 @@ public class OrderController extends BaseController {
         vo.setItems(itemVos);
         return vo;
     }
-
-    private OrderListVO buildOrderDetailVO(MallOrder order) {
+    private OrderListVO buildOrderDetailVO(MallOrder order,String name) {
         // 与 OrderListVO 结构一样，直接复用
-        return buildOrderListVO(order);
+        return buildOrderListVO(order,name);
     }
 }

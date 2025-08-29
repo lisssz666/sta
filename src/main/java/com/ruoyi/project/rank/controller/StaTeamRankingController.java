@@ -3,10 +3,7 @@ package com.ruoyi.project.rank.controller;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.rank.domain.StaPlayerRanking;
-import com.ruoyi.project.rank.domain.StaTeamRanking;
 import com.ruoyi.project.rank.service.IStaTeamRankingService;
-import com.ruoyi.project.rank.service.impl.StaTeamRankingServiceImpl;
-import com.ruoyi.project.statistic.domain.StaBestOfGame;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

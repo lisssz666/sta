@@ -3,8 +3,6 @@ package com.ruoyi.project.video.minio.controller;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.video.minio.config.MinioConfig;
 import io.minio.*;
-import io.minio.errors.*;
-import io.minio.http.Method;
 import io.minio.messages.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +14,6 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Service
 public class VideoMerger {

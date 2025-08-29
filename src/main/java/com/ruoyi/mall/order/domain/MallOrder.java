@@ -20,7 +20,11 @@ public class MallOrder {
     private String address;
     private String phone;
     private String remark;
+    //0未付款 1已付款 2商家已接单 3正在配送 4已完成
     private Integer status;
+    /** 微信支付官方订单号（transaction_id） */
+    private String transactionId;
+    private LocalDateTime payTime;
     @TableLogic
     private Integer deleted;
     private LocalDateTime createTime;

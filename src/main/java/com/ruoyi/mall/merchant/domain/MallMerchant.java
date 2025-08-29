@@ -30,6 +30,8 @@ public class MallMerchant {
     private String openTime;
     /** 0停业 1营业 */
     private Integer status;
+    /** 是否隐藏 1是 0否 */
+    private Integer isHide;
     /** 封面图URL */
     private String coverImg;
     /** 临时上传文件，不入库 */

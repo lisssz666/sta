@@ -371,6 +371,7 @@ ALTER TABLE mall_merchant
     ADD COLUMN deleted TINYINT(1) DEFAULT 0 COMMENT '逻辑删除 0未删 1已删';
     ADD COLUMN delivery_type VARCHAR(10) DEFAULT '外卖' COMMENT '到店/外卖/其他';
     ADD COLUMN merchant_logo VARCHAR(255) COMMENT '商位logo（URL或路径）';
+    ADD COLUMN is_hide	TINYINT(1)   DEFAULT 0 COMMENT '是否隐藏 1是 0否';
 
 
 -- 顺手建几个常用的索引
@@ -415,7 +416,14 @@ CREATE TABLE mall_order (
   INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
 
-ALTER TABLE mall_order   ADD COLUMN merchant_id BIGINT NULL COMMENT '商位ID';
+ALTER TABLE mall_order
+  ADD COLUMN pay_time DATETIME COMMENT '支付时间',
+  ADD COLUMN transaction_id VARCHAR(64) COMMENT '微信支付订单号';
+  ADD COLUMN merchant_id BIGINT NULL COMMENT '商位ID';
+
+-- 复合索引：逻辑删除 + 商位 + 状态 + 时间
+CREATE INDEX idx_order_d_m_s_t
+ON mall_order (deleted, merchant_id, status, create_time DESC);
 
 
 CREATE TABLE mall_order_item (

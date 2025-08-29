@@ -26,6 +26,7 @@ public class VideoController {
     }
 
     //上传文件-生成个人集锦
+    @PostMapping("/processByFile")
     private String processGoalsInVideo(MultipartFile file, List<Integer> goalTimes) {
         // 调用FFmpeg来处理视频
         return videoProcessor.createHighlightUploadVideo(file, goalTimes,99);

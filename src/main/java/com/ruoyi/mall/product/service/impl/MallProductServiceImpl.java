@@ -54,8 +54,21 @@ public class MallProductServiceImpl extends ServiceImpl<MallProductMapper, MallP
     }
 
     @Override
-    public boolean updateProductById(MallProduct product) {
-        return updateById(product);
+    public boolean updateProductById(MallProduct product) throws IOException{
+        MultipartFile avatar = product.getCoverImgFile();
+        try {
+            if (avatar != null && !avatar.isEmpty())
+            {
+                //上传
+                String avatarPath = FileUploadUtils.upload(uploadImgPath, avatar);
+                product.setCoverImg(avatarPath);
+            }
+            return updateById(product);
+        }
+        catch (Exception e)
+        {
+            throw new IOException(e.getMessage(), e);
+        }
     }
 
     @Override

@@ -2,10 +2,8 @@ package com.ruoyi.project.video.controller;
 
 import java.io.IOException;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -14,7 +12,6 @@ import com.ruoyi.project.video.domain.StaVideo;
 import com.ruoyi.project.video.service.IStaVideoService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,15 +87,15 @@ public class StaVideoController extends BaseController
      */
     @PostMapping("/uploadVideo")
     public AjaxResult uploadVideo(@RequestParam("file") MultipartFile file,
-                                  @RequestParam("leagueId")String leagueId,
-                                  @RequestParam("gameId")String gameId) throws IOException {
+                                     @RequestParam("leagueId")String leagueId,
+                                     @RequestParam("gameId")String gameId) throws IOException {
         return AjaxResult.success("上传成功",staVideoService.uploadVideo(file,leagueId,gameId));
     }
 
     // 合并比赛视频
     @PostMapping("/fullPlayBlack")
     public AjaxResult fullPlayBlack(@RequestParam("leagueId") String leagueId,
-                                           @RequestParam("gameId") String gameId) throws Exception {
+                                       @RequestParam("gameId") String gameId) throws Exception {
         AjaxResult result = staVideoService.fullPlayBlack(leagueId, gameId);
         Object msg = result.get("msg");
         result.put("msg",uploadPath+msg);

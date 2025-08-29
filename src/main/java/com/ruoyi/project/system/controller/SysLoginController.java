@@ -1,10 +1,8 @@
 package com.ruoyi.project.system.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import com.ruoyi.common.utils.file.ImageUtils;
 import com.ruoyi.project.system.service.ISysUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,6 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.system.domain.SysMenu;
 import com.ruoyi.project.system.domain.SysUser;
 import com.ruoyi.project.system.service.ISysMenuService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 登录验证

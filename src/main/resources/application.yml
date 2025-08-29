@@ -85,9 +85,10 @@ spring:
       enabled: true
   # redis 配置
   redis:
-    enabled: false
+    enabled: true
     # 地址
-    host: localhost
+#    host: 127.0.0.1
+    host: 114.132.162.213
     # 端口，默认为6379
     port: 6379
     # 数据库索引
@@ -106,8 +107,6 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
-
-
 minio:
   host: http://114.132.162.213:9098
   url: ${minio.host}/${minio.bucket}/
@@ -185,3 +184,19 @@ gen:
 
 common:
   vipDayRemaining: 30
+
+wechat:
+  appid: wx6a9f44e2b18a316e
+  secret: 36cbae0aa940badbc0ee553b8204a0b5
+  pay:
+    # 商户号
+    mchid: 1723914419
+    # 证书序列号
+    serial_no: 3E3D061F8B9979DE74A58AEADCBD25D6358FFCE8
+    notify_url: https://www.ybyoulan.cn:8088/wxpay/notify
+    APIv3_key: C5C783DA25F107618073B9F05EA223E6
+  cert:
+    pub_wechatpay: /opt/cert/wechatpay.pem
+    apiclient_key: /opt/cert/apiclient_key.pem
+    apiclient_cert: /opt/cert/apiclient_cert.pem
+    pub_key: /opt/cert/pub_key.pem

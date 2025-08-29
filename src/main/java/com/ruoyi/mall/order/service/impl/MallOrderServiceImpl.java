@@ -1,29 +1,40 @@
 package com.ruoyi.mall.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.common.core.lang.UUID;
+
+import com.ruoyi.mall.merchant.domain.MallMerchant;
+import com.ruoyi.mall.merchant.service.MallMerchantService;
 import com.ruoyi.mall.order.domain.CreateOrderDTO;
 import com.ruoyi.mall.order.domain.MallOrder;
 import com.ruoyi.mall.order.domain.MallOrderItem;
 import com.ruoyi.mall.order.domain.OrderItemDTO;
+import com.ruoyi.mall.order.domain.vo.OrderItemVO;
+import com.ruoyi.mall.order.domain.vo.OrderListVO;
 import com.ruoyi.mall.order.mapper.MallOrderMapper;
 import com.ruoyi.mall.order.service.MallOrderItemService;
 import com.ruoyi.mall.order.service.MallOrderService;
 import com.ruoyi.mall.product.domain.MallProduct;
 import com.ruoyi.mall.product.service.MallProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // 订单实现
 @Service
+@RequiredArgsConstructor
 public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder>
         implements MallOrderService {
 
@@ -31,15 +42,18 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
     private MallOrderItemService itemService;   // 订单明细
     @Autowired
     private  MallProductService productService; // 商品快照
+    @Autowired
+    private MallMerchantService merchantService;
 
+    @Value("${spring.upload.server}")
+    private String server;
     /**
      * 提交订单（事务）
      * @param dto 前端请求体
      * @return 订单主键 id
      */
     @Transactional(rollbackFor = Exception.class)
-    public Long createOrder(CreateOrderDTO dto) {
-
+    public MallOrder createOrder(CreateOrderDTO dto) {
         /* 1. 取出前端传来的所有商品明细 */
         List<OrderItemDTO> items = dto.getItems();
 
@@ -71,7 +85,8 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
 
         /* 4. 生成订单主表（一条订单） */
         MallOrder order = new MallOrder();
-        order.setOrderNo(UUID.randomUUID().toString());          // 随机订单号
+        String orderNo = "YL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        order.setOrderNo(orderNo);          // 订单号YL+时间时分秒
         order.setUserId(9527L);                                   // 用户id
         order.setAddress(dto.getAddress());                      // 收货地址
         order.setPhone(dto.getPhone());                          // 收货电话
@@ -110,7 +125,7 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         itemService.saveBatch(itemList);
 
         /* 7. 把订单主键返回给前端 */
-        return order.getId();
+        return order;
     }
 
     /**
@@ -152,19 +167,132 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
 
     @Override
     public MallOrder getOrderById(Long id) {
-        return getById(id);
+        MallOrder byId = getById(id);
+        return byId;
     }
 
     /**
      * 按商位查订单（逻辑删除过滤）
      */
-    public List<MallOrder> listOrdersByMerchantId(Long merchantId) {
+    /*public List<MallOrder> listOrdersByMerchantId(Long merchantId,
+                                                  String phone,
+                                                  String status) {
         LambdaQueryWrapper<MallOrder> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MallOrder::getDeleted, 0);            // 逻辑删除过滤
+        wrapper.eq(MallOrder::getDeleted, 0);
+
         if (merchantId != null) {
             wrapper.eq(MallOrder::getMerchantId, merchantId);
         }
+        if (phone != null && !phone.trim().isEmpty()) {
+            wrapper.eq(MallOrder::getPhone, phone.trim());
+        }
+        // 单状态或多状态（逗号分隔）
+        if (status != null && !status.trim().isEmpty()) {
+            if (status.contains(",")) {
+                List<String> list = Arrays.asList(status.split(","));
+                wrapper.in(MallOrder::getStatus, list);
+            } else {
+                wrapper.eq(MallOrder::getStatus, status.trim());
+            }
+        }
         wrapper.orderByDesc(MallOrder::getCreateTime);
         return list(wrapper);
+    }*/
+
+    /**
+     * 一次性查询所有订单（或按商位/手机号/状态筛选）
+     * 特点：不分页、零 N+1、毫秒级返回
+     */
+    public List<OrderListVO> listOrdersNoPage(Long merchantId,
+                                              String phone,
+                                              String status) {
+        // 主查询：只查逻辑删除为 0 的订单
+        LambdaQueryWrapper<MallOrder> w = new LambdaQueryWrapper<>();
+        w.eq(MallOrder::getDeleted, 0);
+        // 可选条件：商位 ID（不传则查全部）
+        if (merchantId != null) w.eq(MallOrder::getMerchantId, merchantId);
+        // 可选条件：手机号（支持空格）
+        if (phone != null && !phone.trim().isEmpty()) w.eq(MallOrder::getPhone, phone.trim());
+        // 可选条件：状态（支持单值或多值逗号分隔）
+        if (status != null && !status.trim().isEmpty()) {
+            if (status.contains(",")) {
+                // 多状态：IN (1,2)
+                w.in(MallOrder::getStatus, Arrays.asList(status.split(",")));
+            } else {
+                // 单状态：= 1
+                w.eq(MallOrder::getStatus, status.trim());
+            }
+        }
+        // 排序：最新订单在前
+        w.orderByDesc(MallOrder::getCreateTime);
+        // 执行查询（一条 SQL，走索引）
+        List<MallOrder> orders = this.list(w);
+        // 空结果直接返回
+        if (orders.isEmpty()) return Collections.emptyList();
+        // 收集所有订单的商位 ID（去重）
+        Set<Long> merchantIds = orders.stream()
+                .map(MallOrder::getMerchantId)
+                .collect(Collectors.toSet());
+        // 一次性查商位 Map（merchantId -> merchantName）
+        Map<Long, String> merchantMap = merchantService.lambdaQuery()
+                .select(MallMerchant::getId, MallMerchant::getName)
+                .in(MallMerchant::getId, merchantIds)
+                .list()
+                .stream()
+                .collect(Collectors.toMap(MallMerchant::getId, MallMerchant::getName));
+
+        // 收集所有订单主键（用于批量明细）
+        Set<Long> orderIds = orders.stream()
+                .map(MallOrder::getId)
+                .collect(Collectors.toSet());
+        // 批量查明细（一次 SQL，按 orderId 分组）
+        Map<Long, List<MallOrderItem>> itemMap = itemService.lambdaQuery()
+                .in(MallOrderItem::getOrderId, orderIds)
+                .list()
+                .stream()
+                .collect(Collectors.groupingBy(MallOrderItem::getOrderId));
+        // 收集所有商品 ID（用于批量封面）
+        Set<Long> productIds = itemMap.values()
+                .stream()
+                .flatMap(List::stream)
+                .map(MallOrderItem::getProductId)
+                .collect(Collectors.toSet());
+        // 批量查封面（一次 SQL）
+        Map<Long, String> coverMap = productService.lambdaQuery()
+                .select(MallProduct::getId, MallProduct::getCoverImg)
+                .in(MallProduct::getId, productIds)
+                .list()
+                .stream()
+                .collect(Collectors.toMap(MallProduct::getId, MallProduct::getCoverImg));
+
+        // 组装 VO（内存 O(n)）
+        return orders.stream()
+                .map(order -> buildOrderListVO(order, itemMap, coverMap, merchantMap))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 组装 VO：把订单 + 明细 + 商品 + 商位 打包
+     */
+    private OrderListVO buildOrderListVO(MallOrder order,
+                                         Map<Long, List<MallOrderItem>> itemMap,
+                                         Map<Long, String> coverMap,
+                                         Map<Long, String> merchantMap) {
+        OrderListVO vo = new OrderListVO();
+        BeanUtils.copyProperties(order, vo);
+        // 真实商位名称
+        vo.setMerchantName(merchantMap.get(order.getMerchantId()));
+        // 明细列表
+        List<OrderItemVO> items = itemMap.getOrDefault(order.getId(), Collections.emptyList())
+                .stream()
+                .map(item -> {
+                    OrderItemVO itemVo = new OrderItemVO();
+                    BeanUtils.copyProperties(item, itemVo);
+                    itemVo.setCoverImg(server+coverMap.getOrDefault(item.getProductId(), ""));
+                    return itemVo;
+                })
+                .collect(Collectors.toList());
+        vo.setItems(items);
+        return vo;
     }
 }

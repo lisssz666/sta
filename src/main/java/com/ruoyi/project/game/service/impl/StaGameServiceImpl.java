@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.framework.web.domain.AjaxResult;
@@ -22,8 +19,6 @@ import com.ruoyi.project.statistic.mapper.StaPlayerStatisticMapper;
 import com.ruoyi.project.video.clip.VideoProcessor;
 import com.ruoyi.project.video.controller.StaVideoController;
 import com.ruoyi.project.video.service.IStaVideoService;
-import com.ruoyi.project.video.service.impl.StaVideoServiceImpl;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
@@ -31,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.game.mapper.StaGameMapper;
 import com.ruoyi.project.game.domain.StaGame;
 import com.ruoyi.project.game.service.IStaGameService;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 比赛信息Service业务层处理

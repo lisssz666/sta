@@ -2,12 +2,9 @@ package com.ruoyi.project.team.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -16,7 +13,6 @@ import com.ruoyi.project.team.domain.StaTeam;
 import com.ruoyi.project.team.service.IStaTeamService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
 
 /**

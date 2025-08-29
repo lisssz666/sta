@@ -1,7 +1,5 @@
 package com.ruoyi.project.statistic.service;
 
-import java.util.List;
-
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.statistic.domain.StaPlayerStatistic;
 

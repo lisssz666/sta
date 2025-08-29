@@ -6,7 +6,6 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.album.domain.StaAlbum;
 import com.ruoyi.project.album.mapper.StaAlbumMapper;
 import com.ruoyi.project.album.service.StaAlbumService;
-import com.ruoyi.project.video.domain.StaVideo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

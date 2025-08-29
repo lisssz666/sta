@@ -6,9 +6,7 @@ import com.ruoyi.mall.product.service.MallProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * 球队分组控制器
@@ -35,13 +33,13 @@ public class ProductController extends BaseController {
 
     /** 修改商品 */
     @PutMapping("/update")
-    public AjaxResult updProduct(MallProduct dto) {
+    public AjaxResult updProduct(MallProduct dto) throws IOException{
         return AjaxResult.success(productService.updateProductById(dto));
     }
 
     /** 商品列表（可按商位筛选） */
     @GetMapping("/list")
-    public AjaxResult  listProduct(@RequestParam(required = false) Long merchantId) {
+    public AjaxResult listProduct(@RequestParam(required = false) Long merchantId) {
         return AjaxResult.success(productService.listProductsByMerchantId(merchantId));
 //        return productService.lambdaQuery()
 //                .eq(merchantId != null, MallProduct::getMerchantId, merchantId)

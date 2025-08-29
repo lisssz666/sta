@@ -5,7 +5,6 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.game.organize.domain.StaOrganizeGameEntity;
 import com.ruoyi.project.game.organize.service.IStaOrganizeGameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class StaOrganizeGameController extends BaseController {
 
     /** 新增 */
     @PostMapping("/add")
-    public AjaxResult add( StaOrganizeGameEntity entity) {
+    public AjaxResult add(StaOrganizeGameEntity entity) {
         boolean ok = staOrganizeGameService.save(entity);
         return ok ? AjaxResult.success("新增成功", entity) : AjaxResult.error("新增失败");
     }
