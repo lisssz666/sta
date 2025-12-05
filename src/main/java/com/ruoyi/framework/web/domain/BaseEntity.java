@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -46,6 +47,7 @@ public class BaseEntity implements Serializable
 
     /** 请求参数 */
     @JsonIgnore
+    @TableField(exist = false)
     private Map<String, Object> params;
 
     public String getSearchValue()

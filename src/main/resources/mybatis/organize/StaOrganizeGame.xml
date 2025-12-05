@@ -5,17 +5,9 @@
 <mapper namespace="com.ruoyi.project.game.organize.mapper.StaOrganizeGameMapper">
     <resultMap type="StaOrganizeGameEntity" id="StaOrganizeGameResult">
         <result property="id"              column="id"/>
-        <result property="teamId"          column="team_id"/>
-        <result property="teamName"        column="team_name"/>
-        <result property="gameDate"        column="game_date"/>
-        <result property="gameTime"        column="game_time"/>
-        <result property="uniform"         column="uniform"/>
-        <result property="fee"             column="fee"/>
-        <result property="referee"         column="referee"/>
-        <result property="level"           column="level"/>
-        <result property="venue"           column="venue"/>
-        <result property="contact"         column="contact"/>
-        <result property="remark"          column="remark"/>
+        <result property="preRemark"       column="pre_remark"/>
+        <result property="teams"           column="teams" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="postRemark"      column="post_remark"/>
         <result property="createBy"        column="create_by"/>
         <result property="createTime"      column="create_time"/>
         <result property="updateBy"        column="update_by"/>
@@ -23,8 +15,7 @@
     </resultMap>
     <!-- 基础字段 -->
     <sql id="Base_Column_List">
-        id, team_id, team_name, game_date, game_time, uniform,
-        fee, referee, level, venue, contact, remark,
+        id, pre_remark, teams, post_remark,
         create_by, create_time, update_by, update_time
     </sql>
 
@@ -34,15 +25,12 @@
         ORDER BY create_time DESC
     </select>
 
-    <insert id="insert" parameterType="StaOrganizeGameEntity"
-            useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="StaOrganizeGameEntity">
         INSERT INTO sta_organize_game
-        (team_id, team_name, game_date, game_time, uniform,
-        fee, referee, level, venue, contact, remark,
+        (pre_remark, teams, post_remark,
         create_by, create_time, update_by, update_time)
         VALUES
-        (#{teamId}, #{teamName}, #{gameDate}, #{gameTime}, #{uniform},
-        #{fee}, #{referee}, #{level}, #{venue}, #{contact}, #{remark},
+        (#{preRemark}, #{teams, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler}, #{postRemark},
         #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
     </insert>
 
@@ -50,5 +38,11 @@
     <delete id="deleteById" parameterType="long">
         DELETE FROM sta_organize_game WHERE id = #{id}
     </delete>
+    
+    <select id="selectById" parameterType="long" resultMap="StaOrganizeGameResult">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sta_organize_game
+        WHERE id = #{id}
+    </select>
 
 </mapper>

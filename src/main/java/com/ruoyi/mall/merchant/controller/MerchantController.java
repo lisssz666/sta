@@ -34,7 +34,7 @@ public class MerchantController  extends BaseController {
     public AjaxResult delMerchant(Long id) {
         return AjaxResult.success(merchantService.removeMerchantById(id));
     }
-
+    
     /**
      * 修改商位
      */

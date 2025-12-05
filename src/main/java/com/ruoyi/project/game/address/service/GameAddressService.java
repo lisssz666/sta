@@ -32,6 +32,10 @@ public class GameAddressService {
     }
 
     public List<GameAddress> findByLeagueId(Long leagueId) {
-        return repository.findByLeagueId(leagueId);
+        if (leagueId == null) {
+            return getAllGameAddresses();
+        } else {
+            return repository.findByLeagueId(leagueId);
+        }
     }
 }
