@@ -36,7 +36,7 @@ public class StaRefereeInfoController extends BaseController {
     }
 
     @PutMapping("/update")
-    public AjaxResult update(StaRefereeInfoEntity entity) {
+    public AjaxResult update(StaRefereeInfoEntity entity) throws IOException{
         return toAjax(service.updateById(entity) ? 1 : 0);
     }
 

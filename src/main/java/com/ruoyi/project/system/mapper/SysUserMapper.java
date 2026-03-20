@@ -3,6 +3,9 @@ package com.ruoyi.project.system.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
 
 import com.ruoyi.project.system.domain.SysUser;
 
@@ -59,6 +62,7 @@ public interface SysUserMapper
      * @param user 用户信息
      * @return 结果
      */
+    @Insert("INSERT INTO sys_user (dept_id, user_name, nick_name, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time, remark, openid) VALUES (#{deptId}, #{userName}, #{nickName}, #{email}, #{phonenumber}, #{sex}, #{avatar}, #{password}, #{status}, #{delFlag}, #{loginIp}, #{loginDate}, #{createBy}, #{createTime}, #{updateBy}, #{updateTime}, #{remark}, #{openid})")
     public int insertUser(SysUser user);
 
     /**
@@ -67,6 +71,7 @@ public interface SysUserMapper
      * @param user 用户信息
      * @return 结果
      */
+    @Update("UPDATE sys_user SET dept_id = #{deptId}, user_name = #{userName}, nick_name = #{nickName}, email = #{email}, phonenumber = #{phonenumber}, sex = #{sex}, avatar = #{avatar}, password = #{password}, status = #{status}, del_flag = #{delFlag}, login_ip = #{loginIp}, login_date = #{loginDate}, update_by = #{updateBy}, update_time = #{updateTime}, remark = #{remark}, openid = #{openid} WHERE user_id = #{userId}")
     public int updateUser(SysUser user);
 
     /**
@@ -76,6 +81,7 @@ public interface SysUserMapper
      * @param avatar 头像地址
      * @return 结果
      */
+    @Update("UPDATE sys_user SET avatar = #{avatar} WHERE user_name = #{userName}")
     public int updateUserAvatar(@Param("userName") String userName, @Param("avatar") String avatar);
 
     /**
@@ -85,6 +91,7 @@ public interface SysUserMapper
      * @param password 密码
      * @return 结果
      */
+    @Update("UPDATE sys_user SET password = #{password} WHERE user_name = #{userName}")
     public int resetUserPwd(@Param("userName") String userName, @Param("password") String password);
 
     /**
@@ -109,6 +116,7 @@ public interface SysUserMapper
      * @param userName 用户名称
      * @return 结果
      */
+    @Select("SELECT COUNT(*) FROM sys_user WHERE user_name = #{userName}")
     public int checkUserNameUnique(String userName);
 
     /**
@@ -117,6 +125,7 @@ public interface SysUserMapper
      * @param phonenumber 手机号码
      * @return 结果
      */
+    @Select("select * from sys_user where phonenumber = #{phonenumber} limit 1")
     public SysUser checkPhoneUnique(String phonenumber);
 
     /**
@@ -125,7 +134,26 @@ public interface SysUserMapper
      * @param email 用户邮箱
      * @return 结果
      */
+    @Select("select * from sys_user where email = #{email} limit 1")
     public SysUser checkEmailUnique(String email);
+
+    /**
+     * 通过openid查询用户
+     *
+     * @param openid 微信openid
+     * @return 用户对象信息
+     */
+    @Select("select * from sys_user where openid = #{openid} limit 1")
+    public SysUser selectUserByOpenid(String openid);
+
+    /**
+     * 校验openid是否唯一
+     *
+     * @param openid 微信openid
+     * @return 结果
+     */
+    @Select("select * from sys_user where openid = #{openid} limit 1")
+    public SysUser checkOpenidUnique(String openid);
 
     /**
      * 根据用户账号设置会员

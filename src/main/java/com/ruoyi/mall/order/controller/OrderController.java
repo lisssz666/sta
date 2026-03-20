@@ -28,9 +28,7 @@ import java.util.stream.Collectors;
 
 import static com.ruoyi.framework.datasource.DynamicDataSourceContextHolder.log;
 
-/**
- * 球队分组控制器
- */
+
 @RestController
 @RequestMapping("/order")
 public class OrderController extends BaseController {

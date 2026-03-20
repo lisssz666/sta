@@ -14,6 +14,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="city"        column="city"/>
         <result property="homeColor"   column="home_color"/>
         <result property="awayColor"   column="away_color"/>
+        <result property="teamIntroduction"   column="team_introduction"/>
+        <result property="attendance"   column="attendance"/>
+        <result property="timeSlot"   column="time_slot"/>
+        <result property="gameOrderCount"   column="game_order_count"/>
         <result property="createBy"    column="create_by"/>
         <result property="createTime"  column="create_time"/>
         <result property="updateBy"    column="update_by"/>
@@ -21,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectStaTeamVo">
-    select id, team_title, team_logo, team_photo, leader_name, leader_phone, city, home_color, away_color, create_by, create_time, update_by, update_time
+    select id, team_title, team_logo, team_photo, leader_name, leader_phone, city, home_color, away_color, team_introduction, attendance, time_slot, game_order_count, create_by, create_time, update_by, update_time
     from sta_team
 </sql>
 
@@ -51,6 +55,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="city != null">city,</if>
             <if test="homeColor != null">home_color,</if>
             <if test="awayColor != null">away_color,</if>
+            <if test="teamIntroduction != null">team_introduction,</if>
+            <if test="attendance != null">attendance,</if>
+            <if test="timeSlot != null">time_slot,</if>
+            <if test="gameOrderCount != null">game_order_count,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -65,6 +73,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="city != null">#{city},</if>
             <if test="homeColor != null">#{homeColor},</if>
             <if test="awayColor != null">#{awayColor},</if>
+            <if test="teamIntroduction != null">#{teamIntroduction},</if>
+            <if test="attendance != null">#{attendance},</if>
+            <if test="timeSlot != null">#{timeSlot},</if>
+            <if test="gameOrderCount != null">#{gameOrderCount},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -76,12 +88,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update sta_team
         <trim prefix="SET" suffixOverrides=",">
             <if test="teamTitle != null">team_title = #{teamTitle},</if>
-            <if test="teamLogo != null">team_logo = #{teamLogo},</if>
+            <if test="teamLogoPath != null">team_logo = #{teamLogoPath},</if>
+            <if test="teamPhotoPath != null">team_photo = #{teamPhotoPath},</if>
             <if test="leaderName != null">leader_name = #{leaderName},</if>
             <if test="leaderPhone != null">leader_phone = #{leaderPhone},</if>
             <if test="city != null">city = #{city},</if>
             <if test="homeColor != null">home_color = #{homeColor},</if>
             <if test="awayColor != null">away_color = #{awayColor},</if>
+            <if test="teamIntroduction != null">team_introduction = #{teamIntroduction},</if>
+            <if test="attendance != null">attendance = #{attendance},</if>
+            <if test="timeSlot != null">time_slot = #{timeSlot},</if>
+            <if test="gameOrderCount != null">game_order_count = #{gameOrderCount},</if>
         </trim>
         where id = #{id}
     </update>

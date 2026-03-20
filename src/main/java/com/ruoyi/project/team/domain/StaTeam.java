@@ -53,5 +53,18 @@ public class StaTeam extends BaseEntity {
 
     /** 客场球衣颜色 */
     private String awayColor;
+
+    /** 球队简介 */
+    private String teamIntroduction;
+
+    /** 出勤 */
+    private String attendance;
+
+    /** 时间段 */
+    private String timeSlot;
+
+    /** 约赛成单总场次 */
+    private String gameOrderCount;
 }
 
+ 

@@ -76,8 +76,11 @@ public class StaTeamServiceImpl implements IStaTeamService
         return staTeams.stream()
                 .peek(sta -> {
                     String logoPath = sta.getTeamLogoPath();
+                    String photoPath = sta.getTeamPhotoPath();
                     logoPath = server + logoPath;
+                    photoPath = server + photoPath;
                     sta.setTeamLogoPath(logoPath);
+                    sta.setTeamPhotoPath(photoPath);
                 })
                 .collect(Collectors.toList());
     }
@@ -130,10 +133,14 @@ public class StaTeamServiceImpl implements IStaTeamService
     @Override
     public int updateStaTeam(StaTeam staTeam) throws IOException {
         staTeam.setUpdateTime(DateUtils.getNowDate());
-        if (staTeam.getIdStr() != null  && !staTeam.getIdStr().isEmpty()){
-            String idStr = staTeam.getIdStr();
-            Long i = Long.valueOf(idStr);
-            staTeam.setId(i);
+        if (staTeam.getIdStr() != null && !staTeam.getIdStr().isEmpty() && !"null".equals(staTeam.getIdStr())) {
+            try {
+                String idStr = staTeam.getIdStr();
+                Long i = Long.valueOf(idStr);
+                staTeam.setId(i);
+            } catch (NumberFormatException e) {
+                // 处理无效的ID格式，不设置ID
+            }
         }
         MultipartFile teamLogo = staTeam.getTeamLogo();
         if (teamLogo != null){
@@ -141,6 +148,13 @@ public class StaTeamServiceImpl implements IStaTeamService
             String logoPath = FileUploadUtils.upload(uploadImgPath, teamLogo);
             staTeam.setTeamLogoPath(logoPath);
         }
+        MultipartFile teamPhoto = staTeam.getTeamPhoto();
+        if (teamPhoto !=null && !teamPhoto.isEmpty())
+            {
+                //上传球队照片
+                String teamPhotoPath = FileUploadUtils.upload(uploadImgPath, teamPhoto);
+                staTeam.setTeamPhotoPath(teamPhotoPath);
+            }
         return staTeamMapper.updateStaTeam(staTeam);
     }
 

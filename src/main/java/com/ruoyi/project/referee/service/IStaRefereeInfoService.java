@@ -11,8 +11,9 @@ import java.util.List;
 public interface IStaRefereeInfoService
 {
     List<StaRefereeInfoEntity> list(StaRefereeInfoEntity entity);
+    List<StaRefereeInfoEntity> listWithAvailableTime(StaRefereeInfoEntity entity);
     StaRefereeInfoEntity getById(Long id);
     boolean save(StaRefereeInfoEntity entity) throws IOException;
-    boolean updateById(StaRefereeInfoEntity entity);
+    boolean updateById(StaRefereeInfoEntity entity) throws IOException;
     boolean removeById(Long id);
 }

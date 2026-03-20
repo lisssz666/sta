@@ -42,7 +42,7 @@ public class StaOrganizeGameEntity extends BaseEntity{
     private String postRemark;
     
     /**
-     * 状态（0-未开始，1-进行中，2-已完成）
+     * 状态（0-未收单，1-已收单）
      */
     @Column(name = "status")
     private Integer status;

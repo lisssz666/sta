@@ -201,12 +201,19 @@ public class TokenService {
      * @param loginUser 登录信息
      */
     public void setUserAgent(LoginUser loginUser) {
-        UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getRequest().getHeader("User-Agent"));
-        String ip = IpUtils.getIpAddr(ServletUtils.getRequest());
-        loginUser.setIpaddr(ip);
-        loginUser.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
-        loginUser.setBrowser(userAgent.getBrowser().getName());
-        loginUser.setOs(userAgent.getOperatingSystem().getName());
+        try {
+            HttpServletRequest request = ServletUtils.getRequest();
+            if (request != null) {
+                UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+                String ip = IpUtils.getIpAddr(request);
+                loginUser.setIpaddr(ip);
+                loginUser.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
+                loginUser.setBrowser(userAgent.getBrowser().getName());
+                loginUser.setOs(userAgent.getOperatingSystem().getName());
+            }
+        } catch (Exception e) {
+            // 忽略异常，确保即使没有请求上下文也能正常创建token
+        }
     }
 
     /**

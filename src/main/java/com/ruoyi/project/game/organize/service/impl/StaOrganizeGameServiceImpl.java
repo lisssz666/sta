@@ -3,6 +3,8 @@ package com.ruoyi.project.game.organize.service.impl;
 import com.ruoyi.project.game.organize.domain.StaOrganizeGameEntity;
 import com.ruoyi.project.game.organize.mapper.StaOrganizeGameMapper;
 import com.ruoyi.project.game.organize.service.IStaOrganizeGameService;
+import com.ruoyi.project.team.domain.StaTeam;
+import com.ruoyi.project.team.service.IStaTeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,9 @@ import java.util.Map;
 public class StaOrganizeGameServiceImpl implements IStaOrganizeGameService {
     @Autowired
     private StaOrganizeGameMapper repository;
+    
+    @Autowired
+    private IStaTeamService staTeamService;
 
     @Override
     public List<StaOrganizeGameEntity> list(StaOrganizeGameEntity entity) {
@@ -175,6 +180,84 @@ public class StaOrganizeGameServiceImpl implements IStaOrganizeGameService {
         
         // 保存更新
         return updateById(existingEntity);
+    }
+    
+    @Override
+    public boolean updateOrganizeGameStatus(Long id, Long teamId, Integer status) {
+        // 查询现有记录
+        StaOrganizeGameEntity existingEntity = getById(id);
+        if (existingEntity == null) {
+            throw new IllegalArgumentException("记录不存在");
+        }
+        
+        // 获取球队数组
+        List<Map<String, Object>> teams = existingEntity.getTeams();
+        if (teams == null || teams.isEmpty()) {
+            throw new IllegalArgumentException("球队信息不存在");
+        }
+        
+        // 根据teamId查找对应的球队
+        Map<String, Object> targetTeam = null;
+        for (Map<String, Object> team : teams) {
+            // 获取球队ID，可以是Number类型或String类型
+            Object teamIdObj = team.get("teamId");
+            if (teamIdObj != null) {
+                Long currentTeamId = null;
+                if (teamIdObj instanceof Number) {
+                    currentTeamId = ((Number) teamIdObj).longValue();
+                } else if (teamIdObj instanceof String) {
+                    try {
+                        currentTeamId = Long.parseLong((String) teamIdObj);
+                    } catch (NumberFormatException e) {
+                        // 跳过格式错误的teamId
+                        continue;
+                    }
+                }
+                
+                // 找到目标球队
+                if (currentTeamId != null && currentTeamId.equals(teamId)) {
+                    targetTeam = team;
+                    break;
+                }
+            }
+        }
+        
+        if (targetTeam == null) {
+            throw new IllegalArgumentException("未找到指定的球队");
+        }
+        
+        // 检查球队之前的状态，判断是否需要更新统计
+        Integer oldStatus = (Integer) targetTeam.get("status");
+        
+        // 更新球队的status为入参的status
+        targetTeam.put("status", status);
+        
+        // 更新记录的更新时间
+        existingEntity.setUpdateTime(new Date());
+        
+        // 保存更新
+        boolean result = updateById(existingEntity);
+        
+        // 只有当球队状态从非1变为1时，才更新约赛成单总场次
+        if (result && !Integer.valueOf(1).equals(oldStatus) && Integer.valueOf(1).equals(status)) {
+            try {
+                StaTeam staTeam = staTeamService.selectStaTeamById(teamId);
+                if (staTeam != null) {
+                    // 如果之前没有统计数据，默认设置为0
+                    if (staTeam.getGameOrderCount() == null) {
+                        staTeam.setGameOrderCount(0);
+                    }
+                    staTeam.setGameOrderCount(staTeam.getGameOrderCount() + 1);
+                    staTeamService.updateStaTeam(staTeam);
+                }
+            } catch (Exception e) {
+                // 统计更新失败不影响主要操作，但需要记录日志
+                System.err.println("更新球队约赛成单总场次失败: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
+        return result;
     }
     
     @Override

@@ -23,7 +23,7 @@ server:
   ssl:
     key-store: classpath:ybyoulan.cn.pfx
     key-store-type: PKCS12
-    key-store-password: t71444b5qgc
+    key-store-password: fgd6b86sm29
     key-alias: ybyoulan.cn
   servlet:
     # 应用的访问路径
@@ -195,6 +195,9 @@ wechat:
     serial_no: 3E3D061F8B9979DE74A58AEADCBD25D6358FFCE8
     notify_url: https://www.ybyoulan.cn:8088/wxpay/notify
     APIv3_key: C5C783DA25F107618073B9F05EA223E6
+  referee_pay:
+    # 裁判支付通知回调接口
+    notify_url: https://www.ybyoulan.cn:8088/referee/pay/notify
   cert:
     pub_wechatpay: /opt/cert/wechatpay.pem
     apiclient_key: /opt/cert/apiclient_key.pem

@@ -299,6 +299,13 @@
             <version>2.2.6</version>
         </dependency>
 
+        <!--    bouncycastle 加密库-->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.68</version>
+        </dependency>
+
         <!--    mybatis-plus -->
         <dependency>
             <groupId>com.baomidou</groupId>

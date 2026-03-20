@@ -1,0 +1,1 @@
+ALTER TABLE `sta_team` ADD COLUMN `team_introduction` VARCHAR(500) NULL COMMENT '球队简介' AFTER `away_color`;

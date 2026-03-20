@@ -16,6 +16,9 @@
         <result property="refereeYears" column="referee_years"/>
         <result property="price" column="price"/>
         <result property="orderCount" column="order_count"/>
+        <result property="refereeResume" column="referee_resume"/>
+        <result property="overallRating" column="overall_rating"/>
+        <result property="praiseRate" column="praise_rate"/>
         <result property="scheduleLog" column="schedule_log"/>
         <result property="createBy"   column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -25,7 +28,7 @@
 
     <sql id="Base_Column_List">
         id,name,avatar,level,cert_date,reg_unit,signature,status,
-        remark,referee_years,price,order_count,schedule_log,
+        remark,referee_years,price,order_count,referee_resume,overall_rating,praise_rate,schedule_log,
         create_by,create_time,update_by,update_time
     </sql>
 
@@ -50,11 +53,11 @@
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO sta_referee_info
         (name, avatar, level, cert_date, reg_unit, signature, status,
-        remark, referee_years,price,order_count, schedule_log,
+        remark, referee_years,price,order_count,referee_resume,overall_rating,praise_rate, schedule_log,
         create_by, create_time, update_by, update_time)
         VALUES
         (#{name}, #{avatarPath}, #{level}, #{certDate}, #{regUnit}, #{signature}, #{status},
-        #{remark}, #{refereeYears},#{price},#{orderCount}, #{scheduleLog},
+        #{remark}, #{refereeYears},#{price},#{orderCount},#{refereeResume},#{overallRating},#{praiseRate}, #{scheduleLog},
         #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
     </insert>
 
@@ -62,7 +65,7 @@
         UPDATE sta_referee_info
         <set>
             <if test="name != null">name = #{name},</if>
-            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="avatarPath != null">avatar = #{avatarPath},</if>
             <if test="level != null">level = #{level},</if>
             <if test="certDate != null">cert_date = #{certDate},</if>
             <if test="regUnit != null">reg_unit = #{regUnit},</if>
@@ -72,6 +75,9 @@
             <if test="refereeYears != null">referee_years = #{refereeYears},</if>
             <if test="price != null">price = #{price},</if>
             <if test="orderCount != null">order_count = #{orderCount},</if>
+            <if test="refereeResume != null">referee_resume = #{refereeResume},</if>
+            <if test="overallRating != null">overall_rating = #{overallRating},</if>
+            <if test="praiseRate != null">praise_rate = #{praiseRate},</if>
             <if test="scheduleLog != null">schedule_log = #{scheduleLog},</if>
             update_by = #{updateBy},
             update_time = #{updateTime}

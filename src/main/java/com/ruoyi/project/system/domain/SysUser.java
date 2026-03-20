@@ -101,6 +101,9 @@ public class SysUser extends BaseEntity
     /** 会员剩余天数 */
     private Long vipDayRemain;
 
+    /** 微信OpenID */
+    private String openid;
+
 
 
     public SysUser()
@@ -335,6 +338,14 @@ public class SysUser extends BaseEntity
         this.vipDayRemain = vipDayRemain;
     }
 
+    public String getOpenid() {
+        return openid;
+    }
+
+    public void setOpenid(String openid) {
+        this.openid = openid;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -356,6 +367,7 @@ public class SysUser extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
+            .append("openid", getOpenid())
             .append("dept", getDept())
             .toString();
     }

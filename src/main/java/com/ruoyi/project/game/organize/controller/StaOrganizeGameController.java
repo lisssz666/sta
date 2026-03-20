@@ -1,8 +1,10 @@
 package com.ruoyi.project.game.organize.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.game.organize.domain.StaOrganizeGameEntity;
 import com.ruoyi.project.game.organize.service.IStaOrganizeGameService;
 import com.ruoyi.project.game.organize.util.RequestParamParser;
@@ -30,16 +32,22 @@ public class StaOrganizeGameController extends BaseController {
      * 返回包含前备注、球队数组和后备注的数据结构
      */
     @GetMapping("/list")
-    public AjaxResult list(StaOrganizeGameEntity entity) {
+    public TableDataInfo list(StaOrganizeGameEntity entity) {
         try {
+            startPage();
             // 调用Service层获取组织比赛列表
             List<StaOrganizeGameEntity> organizeGames = service.list(entity);
             
-            // 返回完整的记录列表
-            return AjaxResult.success(organizeGames);
+            // 返回分页数据
+            return getDataTable(organizeGames);
         } catch (Exception e) {
             logger.error("查询组织比赛失败", e);
-            return AjaxResult.error("查询失败: " + e.getMessage());
+            TableDataInfo rspData = new TableDataInfo();
+            rspData.setCode(500);
+            rspData.setMsg("查询失败: " + e.getMessage());
+            rspData.setData(new ArrayList<>());
+            rspData.setTotal(0L);
+            return rspData;
         }
     }
 
@@ -66,6 +74,8 @@ public class StaOrganizeGameController extends BaseController {
                           @RequestParam(required = false) Map<String, String> queryParams,
                           @RequestHeader(required = false) String contentType,
                           HttpServletRequest request) {
+         logger.info("新增组织比赛queryParams：{}", queryParams);
+
         try {
             // 使用万能参数解析器解析请求参数
             Map<String, Object> requestData = requestParamParser.parseRequestParams(
@@ -143,13 +153,59 @@ public class StaOrganizeGameController extends BaseController {
             return AjaxResult.error("操作失败: " + e.getMessage());
         }
     }
+    
+    /**
+     * 约赛收单接口 - 更新特定球队的收单状态
+     * @param id 组织比赛ID
+     * @param teamId 球队ID
+     * @param status 收单状态
+     * @return 更新结果
+     */
+    @PutMapping("/updateOrganizeGameStatus")
+    public AjaxResult updateOrganizeGameStatus(@RequestParam Long id,
+                                               @RequestParam Long teamId,
+                                               @RequestParam Integer status) {
+        try {
+            // 验证请求参数
+            if (id == null || teamId == null || status == null) {
+                return AjaxResult.error("请求参数不完整，缺少id、teamId或status");
+            }
+            
+            // 调用Service层更新球队收单状态
+            boolean updated = service.updateOrganizeGameStatus(id, teamId, status);
+            
+            if (updated) {
+                return AjaxResult.success("球队收单状态更新成功");
+            } else {
+                return AjaxResult.error("球队收单状态更新失败");
+            }
+        } catch (IllegalArgumentException e) {
+            return AjaxResult.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error("约赛收单失败", e);
+            return AjaxResult.error("操作失败: " + e.getMessage());
+        }
+    }
 
     /**
-     * 更新组织比赛
+     * 更新组织比赛 - 万能方法
+     * 支持JSON请求体、Form表单提交和URL参数
      */
     @PutMapping("/updateById")
-    public AjaxResult update( Map<String, Object> requestData) {
+    public AjaxResult update(@RequestBody(required = false) Map<String, Object> jsonBody,
+                          @RequestParam(required = false) Map<String, String> queryParams,
+                          @RequestHeader(required = false) String contentType,
+                          HttpServletRequest request) {
+         logger.info("更新组织比赛queryParams：{}", queryParams);
+
         try {
+            // 使用万能参数解析器解析请求参数
+            Map<String, Object> requestData = requestParamParser.parseRequestParams(
+                    jsonBody, queryParams, contentType, request);
+
+            // 打印最终合并后的请求参数
+            logger.info("更新组织比赛最终请求参数：{}", requestData);
+
             // 调用Service层更新组织比赛
             boolean updated = service.updateOrganizeGame(requestData);
             
@@ -169,8 +225,8 @@ public class StaOrganizeGameController extends BaseController {
     /**
      * 删除组织比赛
      */
-    @DeleteMapping("/deleteById/{id}")
-    public AjaxResult delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/deleteById")
+    public AjaxResult delete(Long id) {
         try {
             return toAjax(service.removeById(id));
         } catch (Exception e) {

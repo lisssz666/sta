@@ -63,6 +63,15 @@ public interface IStaOrganizeGameService {
     boolean updateOrganizeGameStatus(Long id, Integer status);
     
     /**
+     * 约赛收单接口 - 更新特定球队的收单状态
+     * @param id 组织比赛ID
+     * @param teamId 球队ID
+     * @param status 收单状态
+     * @return 是否更新成功
+     */
+    boolean updateOrganizeGameStatus(Long id, Long teamId, Integer status);
+    
+    /**
      * 更新组织比赛信息
      * @param id 主键ID
      * @param requestData 请求数据

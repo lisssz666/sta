@@ -1,0 +1,2 @@
+ALTER TABLE `sta_team` ADD COLUMN `attendance` VARCHAR(200) NULL COMMENT '出勤' AFTER `team_introduction`;
+ALTER TABLE `sta_team` ADD COLUMN `time_slot` VARCHAR(200) NULL COMMENT '时间段' AFTER `attendance`;

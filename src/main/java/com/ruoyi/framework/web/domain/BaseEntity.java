@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * 
  * @author ruoyi
  */
-@JsonInclude(value= JsonInclude.Include.NON_NULL)
+@JsonInclude(value= JsonInclude.Include.ALWAYS)
 public class BaseEntity implements Serializable
 {
     private static final long serialVersionUID = 1L;

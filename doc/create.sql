@@ -106,3 +106,19 @@ CREATE TABLE `sta_video` (
 ) ENGINE=InnoDB AUTO_INCREMENT=314 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='视频录像文件表';
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `sta_live_person` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(255) DEFAULT NULL COMMENT '直播人员姓名',
+  `avatar_url` varchar(500) DEFAULT NULL COMMENT '直播人员头像URL',
+  `qualification` varchar(500) DEFAULT NULL COMMENT '直播资质描述',
+  `friend_price` decimal(10,2) DEFAULT NULL COMMENT '亲友价（元/队）',
+  `live_count` int(11) DEFAULT '0' COMMENT '直播场次总数',
+  `content_desc` varchar(1000) DEFAULT NULL COMMENT '直播内容描述',
+  `status` int(11) DEFAULT '1' COMMENT '状态：0-禁用 1-启用',
+  `is_hide` int(11) DEFAULT '0' COMMENT '是否隐藏：1-是 0-否',
+  `deleted` int(11) DEFAULT '0' COMMENT '逻辑删除：0-未删 1-已删',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='直播人员信息表';
