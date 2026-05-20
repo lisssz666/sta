@@ -198,6 +198,9 @@ wechat:
   referee_pay:
     # 裁判支付通知回调接口
     notify_url: https://www.ybyoulan.cn:8088/referee/pay/notify
+  liveperson_pay:
+    # 直播人员支付通知回调接口
+    notify_url: https://www.ybyoulan.cn:8088/liveperson/pay/notify
   cert:
     pub_wechatpay: /opt/cert/wechatpay.pem
     apiclient_key: /opt/cert/apiclient_key.pem

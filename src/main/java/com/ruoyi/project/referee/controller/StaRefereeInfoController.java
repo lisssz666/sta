@@ -2,6 +2,7 @@ package com.ruoyi.project.referee.controller;
 
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.referee.domain.StaRefereeInfoEntity;
 import com.ruoyi.project.referee.service.IStaRefereeInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,9 @@ public class StaRefereeInfoController extends BaseController {
     private IStaRefereeInfoService service;
 
     @GetMapping("/list")
-    public AjaxResult list(StaRefereeInfoEntity query) {
-        return AjaxResult.success(service.list(query));
+    public TableDataInfo list(StaRefereeInfoEntity query) {
+        startPage();
+        return getDataTable(service.list(query));
     }
 
     @GetMapping("/getById")

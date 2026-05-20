@@ -200,6 +200,18 @@ public class RefereeOrderServiceImpl extends ServiceImpl<RefereeOrderMapper, Ref
         return orderList.stream().map(this::convertToVO).collect(Collectors.toList());
     }
 
+    @Override
+    public List<RefereeOrderVO> listAll() {
+        // 查询所有订单，按创建时间降序排序
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<RefereeOrder> queryWrapper = 
+                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time");
+        List<RefereeOrder> orderList = this.list(queryWrapper);
+        return orderList.parallelStream()
+        .map(this::convertToVO)
+        .collect(Collectors.toList());
+    }
+
     // 转换为VO
     private RefereeOrderVO convertToVO(RefereeOrder order) {
         RefereeOrderVO vo = new RefereeOrderVO();

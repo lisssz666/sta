@@ -25,6 +25,9 @@ public interface RefereeOrderService {
     /** 根据参数查询订单列表 */
     List<RefereeOrderVO> listOrdersNoPage(Long refereeId, String contactPhone, Integer status);
     
+    /** 查询所有订单 */
+    List<RefereeOrderVO> listAll();
+    
     /** 取消订单（包含退款流程和时间段放开） */
     boolean cancelOrder(Long orderId) throws Exception;
 }

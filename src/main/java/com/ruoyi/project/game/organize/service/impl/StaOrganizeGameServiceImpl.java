@@ -245,9 +245,11 @@ public class StaOrganizeGameServiceImpl implements IStaOrganizeGameService {
                 if (staTeam != null) {
                     // 如果之前没有统计数据，默认设置为0
                     if (staTeam.getGameOrderCount() == null) {
-                        staTeam.setGameOrderCount(0);
+                        staTeam.setGameOrderCount("0");
                     }
-                    staTeam.setGameOrderCount(staTeam.getGameOrderCount() + 1);
+                    // 将String转换为整数进行加法操作，然后再转换回String
+                    int count = Integer.parseInt(staTeam.getGameOrderCount());
+                    staTeam.setGameOrderCount(String.valueOf(count + 1));
                     staTeamService.updateStaTeam(staTeam);
                 }
             } catch (Exception e) {
@@ -302,6 +304,10 @@ public class StaOrganizeGameServiceImpl implements IStaOrganizeGameService {
                 throw new IllegalArgumentException("状态值无效，必须为0、1或2");
             }
             existingEntity.setStatus(status);
+        }
+        if (requestData.containsKey("isHide")) {
+            Boolean isHide = (Boolean) requestData.get("isHide");
+            existingEntity.setIsHide(isHide);
         }
         
         // 更新更新时间

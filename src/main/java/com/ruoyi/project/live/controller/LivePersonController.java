@@ -2,6 +2,7 @@ package com.ruoyi.project.live.controller;
 
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.live.domain.LivePerson;
 import com.ruoyi.project.live.service.LivePersonService;
 
@@ -58,13 +59,14 @@ public class LivePersonController extends BaseController {
     }
 
     /**
-     * 查询直播人员列表
+     * 查询直播人员列表（分页）
      *
      * @return 直播人员列表
      */
     @GetMapping("/list")
-    public AjaxResult listLivePersons() {
-        return AjaxResult.success(livePersonService.listLivePersons());
+    public TableDataInfo listLivePersons() {
+        startPage();
+        return getDataTable(livePersonService.listLivePersons());
     }
 
     /**

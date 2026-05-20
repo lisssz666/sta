@@ -42,4 +42,16 @@ public class StaRefereeInfoEntity extends BaseEntity {
     // 用于JSON序列化的字段，不存储到数据库
     @JsonProperty("scheduleLog")
     private transient List<Map<String, Object>> availableTime;
+    
+    /**
+     * 是否隐藏（false-否，true-是）
+     */
+    @Column(name = "is_hide")
+    private Boolean isHide;
+    
+    /**
+     * 场地信息列表（仅用于返回给前端，不存储到数据库）
+     */
+    @Transient
+    private List<Map<String, String>> pitch;
 }

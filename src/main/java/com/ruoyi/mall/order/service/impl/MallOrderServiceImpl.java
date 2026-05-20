@@ -271,6 +271,68 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<OrderListVO> findAll() {
+        return listOrdersNoPage(null, null, null);
+    }
+
+    @Override
+    public boolean cancelOrder(Long id) {
+        // 更新订单状态为已取消（状态码2）
+        return lambdaUpdate()
+                .set(MallOrder::getStatus, 2)
+                .eq(MallOrder::getId, id)
+                .eq(MallOrder::getDeleted, 0)
+                .update();
+    }
+
+    @Override
+    public OrderListVO getOrderVOById(Long id) {
+        // 根据ID查询订单
+        MallOrder order = getById(id);
+        if (order == null) {
+            return null;
+        }
+        
+        // 查询商位信息
+        MallMerchant merchant = merchantService.getById(order.getMerchantId());
+        
+        // 查询订单明细
+        List<MallOrderItem> items = itemService.lambdaQuery()
+                .eq(MallOrderItem::getOrderId, id)
+                .list();
+        
+        // 收集商品ID并查询封面
+        Set<Long> productIds = items.stream()
+                .map(MallOrderItem::getProductId)
+                .collect(Collectors.toSet());
+        Map<Long, String> coverMap = productService.lambdaQuery()
+                .select(MallProduct::getId, MallProduct::getCoverImg)
+                .in(MallProduct::getId, productIds)
+                .list()
+                .stream()
+                .collect(Collectors.toMap(MallProduct::getId, MallProduct::getCoverImg));
+        
+        // 组装VO
+        OrderListVO vo = new OrderListVO();
+        BeanUtils.copyProperties(order, vo);
+        if (merchant != null) {
+            vo.setMerchantName(merchant.getName());
+        }
+        
+        List<OrderItemVO> itemVOs = items.stream()
+                .map(item -> {
+                    OrderItemVO itemVo = new OrderItemVO();
+                    BeanUtils.copyProperties(item, itemVo);
+                    itemVo.setCoverImg(server + coverMap.getOrDefault(item.getProductId(), ""));
+                    return itemVo;
+                })
+                .collect(Collectors.toList());
+        vo.setItems(itemVOs);
+        
+        return vo;
+    }
+
     /**
      * 组装 VO：把订单 + 明细 + 商品 + 商位 打包
      */

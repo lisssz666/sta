@@ -8,6 +8,8 @@
         <result property="preRemark"       column="pre_remark"/>
         <result property="teams"           column="teams" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result property="postRemark"      column="post_remark"/>
+        <result property="status"          column="status"/>
+        <result property="isHide"          column="is_hide"/>
         <result property="createBy"        column="create_by"/>
         <result property="createTime"      column="create_time"/>
         <result property="updateBy"        column="update_by"/>
@@ -15,7 +17,7 @@
     </resultMap>
     <!-- 基础字段 -->
     <sql id="Base_Column_List">
-        id, pre_remark, teams, post_remark,
+        id, pre_remark, teams, post_remark, status, is_hide,
         create_by, create_time, update_by, update_time
     </sql>
 
@@ -27,10 +29,10 @@
 
     <insert id="insert" parameterType="StaOrganizeGameEntity">
         INSERT INTO sta_organize_game
-        (pre_remark, teams, post_remark,
+        (pre_remark, teams, post_remark, status, is_hide,
         create_by, create_time, update_by, update_time)
         VALUES
-        (#{preRemark}, #{teams, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler}, #{postRemark},
+        (#{preRemark}, #{teams, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler}, #{postRemark}, #{status}, #{isHide},
         #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
     </insert>
 
@@ -44,5 +46,19 @@
         FROM sta_organize_game
         WHERE id = #{id}
     </select>
+
+    <update id="updateById">
+        UPDATE sta_organize_game
+        <set>
+            <if test="entity.preRemark != null">pre_remark = #{entity.preRemark},</if>
+            <if test="entity.teams != null">teams = #{entity.teams, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler},</if>
+            <if test="entity.postRemark != null">post_remark = #{entity.postRemark},</if>
+            <if test="entity.status != null">status = #{entity.status},</if>
+            <if test="entity.isHide != null">is_hide = #{entity.isHide},</if>
+            <if test="entity.updateBy != null">update_by = #{entity.updateBy},</if>
+            update_time = #{entity.updateTime}
+        </set>
+        WHERE id = #{entity.id}
+    </update>
 
 </mapper>

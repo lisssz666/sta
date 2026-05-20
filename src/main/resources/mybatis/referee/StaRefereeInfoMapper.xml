@@ -6,7 +6,7 @@
     <resultMap type="com.ruoyi.project.referee.domain.StaRefereeInfoEntity" id="StaRefereeInfoResult">
         <result property="id"         column="id"/>
         <result property="name"       column="name"/>
-        <result property="avatarPath"     column="avatar"/>
+        <result property="avatarPath" column="avatar"/>
         <result property="level"      column="level"/>
         <result property="certDate"   column="cert_date"/>
         <result property="regUnit"    column="reg_unit"/>
@@ -20,6 +20,7 @@
         <result property="overallRating" column="overall_rating"/>
         <result property="praiseRate" column="praise_rate"/>
         <result property="scheduleLog" column="schedule_log"/>
+        <result property="isHide"     column="is_hide"/>
         <result property="createBy"   column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy"   column="update_by"/>
@@ -28,7 +29,7 @@
 
     <sql id="Base_Column_List">
         id,name,avatar,level,cert_date,reg_unit,signature,status,
-        remark,referee_years,price,order_count,referee_resume,overall_rating,praise_rate,schedule_log,
+        remark,referee_years,price,order_count,referee_resume,overall_rating,praise_rate,schedule_log,is_hide,
         create_by,create_time,update_by,update_time
     </sql>
 
@@ -53,11 +54,11 @@
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO sta_referee_info
         (name, avatar, level, cert_date, reg_unit, signature, status,
-        remark, referee_years,price,order_count,referee_resume,overall_rating,praise_rate, schedule_log,
+        remark, referee_years,price,order_count,referee_resume,overall_rating,praise_rate, schedule_log,is_hide,
         create_by, create_time, update_by, update_time)
         VALUES
         (#{name}, #{avatarPath}, #{level}, #{certDate}, #{regUnit}, #{signature}, #{status},
-        #{remark}, #{refereeYears},#{price},#{orderCount},#{refereeResume},#{overallRating},#{praiseRate}, #{scheduleLog},
+        #{remark}, #{refereeYears},#{price},#{orderCount},#{refereeResume},#{overallRating},#{praiseRate}, #{scheduleLog},#{isHide},
         #{createBy}, #{createTime}, #{updateBy}, #{updateTime})
     </insert>
 
@@ -79,6 +80,7 @@
             <if test="overallRating != null">overall_rating = #{overallRating},</if>
             <if test="praiseRate != null">praise_rate = #{praiseRate},</if>
             <if test="scheduleLog != null">schedule_log = #{scheduleLog},</if>
+            <if test="isHide != null">is_hide = #{isHide},</if>
             update_by = #{updateBy},
             update_time = #{updateTime}
         </set>

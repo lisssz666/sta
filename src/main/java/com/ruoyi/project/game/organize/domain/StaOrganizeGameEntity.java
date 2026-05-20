@@ -47,5 +47,11 @@ public class StaOrganizeGameEntity extends BaseEntity{
     @Column(name = "status")
     private Integer status;
     
+    /**
+     * 是否隐藏（false-否，true-是）
+     */
+    @Column(name = "is_hide")
+    private Boolean isHide;
+    
 // getter/setter 省略
 }

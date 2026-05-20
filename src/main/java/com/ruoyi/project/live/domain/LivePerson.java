@@ -1,11 +1,15 @@
 package com.ruoyi.project.live.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 直播人员信息实体类
@@ -63,9 +67,27 @@ public class LivePerson {
     private Integer status;
 
     /**
-     * 是否隐藏：1-是 0-否
+     * 是否隐藏：true-是 false-否
      */
-    private Integer isHide;
+    private Boolean isHide;
+
+    /**
+     * 日程日志（JSON格式存储）
+     */
+    @JsonIgnore
+    private String scheduleLog;
+    
+    /**
+     * 用于JSON序列化的可用时间段，不存储到数据库
+     */
+    @JsonProperty("scheduleLog")
+    private transient List<Map<String, Object>> availableTime;
+    
+    /**
+     * 场地信息列表（仅用于返回给前端，不存储到数据库）
+     */
+    @TableField(exist = false)
+    private List<Map<String, String>> pitch;
 
     /**
      * 逻辑删除：0-未删 1-已删

@@ -71,22 +71,20 @@ CREATE TABLE sta_game (
     game_status INT default 0 COMMENT '比赛状态0未开始，1进行中，2已结束',
     game_stage VARCHAR(50) COMMENT '比赛阶段',
     venue_name VARCHAR(255) COMMENT '比赛场地',
-    create_by   varchar(64)     default '' comment '创建者',
-    create_time  timestamp     NULL   default CURRENT_TIMESTAMP comment '创建时间',
-    update_by  varchar(64)     default ''  comment '更新者',
-    update_time  timestamp   NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP   comment '更新时间',
-    primary key (id)
+    home_color VARCHAR(255) COMMENT '主队颜色',
+    away_color VARCHAR(255) COMMENT '客队颜色',
+    home_paused INT COMMENT '主队暂停次数',
+    away_paused INT COMMENT '客队暂停次数',
+    home_fouls INT COMMENT '主队犯规次数',
+    away_fouls INT COMMENT '客队犯规次数',
+    hsessions_score VARCHAR(255) COMMENT '主队各节得分',
+    asessions_score VARCHAR(255) COMMENT '客队各节得分',
+    create_by VARCHAR(64) DEFAULT '' COMMENT '创建者',
+    create_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_by VARCHAR(64) DEFAULT '' COMMENT '更新者',
+    update_time TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (id)
 ) COMMENT='比赛信息表';
-
-ALTER TABLE sta_game
-ADD COLUMN home_color VARCHAR(255),
-ADD COLUMN away_color VARCHAR(255),
-ADD COLUMN home_paused INT,
-ADD COLUMN away_paused INT,
-ADD COLUMN home_fouls INT,
-ADD COLUMN away_fouls INT,
-ADD COLUMN hsessions_score VARCHAR(255),
-ADD COLUMN asessions_score VARCHAR(255);
 
 drop table if exists sta_team;
 CREATE TABLE sta_team (
@@ -317,115 +315,103 @@ CREATE TABLE `sta_organize_game` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='球队约球信息表';
 
 CREATE TABLE `sta_referee_info` (
-  `id`          bigint(20)   NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name`        varchar(64)  NOT NULL COMMENT '姓名',
-  `avatar`      varchar(255) DEFAULT NULL COMMENT '裁判头像',
-  `level`       varchar(32)  DEFAULT NULL COMMENT '等级',
-  `cert_date`   date         DEFAULT NULL COMMENT '获证日期',
-  `reg_unit`    varchar(128) DEFAULT NULL COMMENT '注册单位',
-  `signature`   varchar(255) DEFAULT NULL COMMENT '个性签名',
-  `status`      char(1)      DEFAULT '1' COMMENT '状态 1正常 0停用',
-  `remark`      varchar(255) DEFAULT NULL COMMENT '备注',
-  `order_count` int(11)      DEFAULT 0 COMMENT '订单数',
-  `schedule_log` text         COMMENT '排班记录(JSON)',
-  `create_by`   varchar(64)  DEFAULT '' COMMENT '创建者',
-	 create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by`   varchar(64)  DEFAULT '' COMMENT '更新者',
-  `update_time` DATETIME    NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id`            bigint(20)   NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name`          varchar(64)  NOT NULL COMMENT '姓名',
+  `avatar`        varchar(255) DEFAULT NULL COMMENT '裁判头像',
+  `level`         varchar(32)  DEFAULT NULL COMMENT '等级',
+  `cert_date`     date         DEFAULT NULL COMMENT '获证日期',
+  `reg_unit`      varchar(128) DEFAULT NULL COMMENT '注册单位',
+  `signature`     varchar(255) DEFAULT NULL COMMENT '个性签名',
+  `status`        char(1)      DEFAULT '1' COMMENT '状态 1正常 0停用',
+  `remark`        varchar(255) DEFAULT NULL COMMENT '备注',
+  `order_count`   int(11)      DEFAULT 0 COMMENT '订单数',
+  `schedule_log`  text         COMMENT '排班记录(JSON)',
+  `referee_years` INT          DEFAULT 0 COMMENT '执裁年限(年)',
+  `price`         VARCHAR(32)  DEFAULT '0' COMMENT '价格(字符串)',
+  `create_by`     varchar(64)  DEFAULT '' COMMENT '创建者',
+  `create_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by`     varchar(64)  DEFAULT '' COMMENT '更新者',
+  `update_time`   DATETIME     NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='裁判信息表';
 
-ALTER TABLE sta_referee_info
-  ADD COLUMN referee_years INT DEFAULT 0 COMMENT '执裁年限(年)',
-  ADD COLUMN price VARCHAR(32) DEFAULT '0' COMMENT '价格(字符串)';
-
 ================================================商城=========================================================================
 
--- 商位表
+-- 商位表（合并所有字段）
 CREATE TABLE mall_merchant (
   id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
   name          VARCHAR(64)  NOT NULL COMMENT '摊位名称',
-  address       VARCHAR(255)  COMMENT '摊位地址',
-  phone         VARCHAR(20)   COMMENT '联系电话',
-  open_time     VARCHAR(32)   COMMENT '营业时段 如18:00-01:00',
+  slogan        VARCHAR(100) COMMENT '商品标语',
+  address       VARCHAR(255) COMMENT '摊位地址',
+  address_abbr  VARCHAR(32)  COMMENT '地址简称',
+  phone         VARCHAR(20)  COMMENT '联系电话',
+  open_time     VARCHAR(32)  COMMENT '营业时段 如18:00-01:00',
   status        TINYINT(1) DEFAULT 1 COMMENT '营业状态 1营业 0停业',
   cover_img     VARCHAR(255) COMMENT '封面图URL',
   score         VARCHAR(20)  COMMENT '评分',
-  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
-  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_status (status)
+  comment_num   INT DEFAULT 0 COMMENT '评论数',
+  category      VARCHAR(32)  COMMENT '经营类别',
+  distance_km   VARCHAR(32)  COMMENT '距离(km)',
+  parking       VARCHAR(32) DEFAULT 0 COMMENT '停车便利',
+  open_day      VARCHAR(10) DEFAULT 0 COMMENT '24小时营业',
+  rank_text     VARCHAR(64)  COMMENT '榜单描述',
+  delivery_type VARCHAR(10) DEFAULT '外卖' COMMENT '到店/外卖/其他',
+  merchant_logo VARCHAR(255) COMMENT '商位logo（URL或路径）',
+  is_hide       TINYINT(1) DEFAULT 0 COMMENT '是否隐藏 1是 0否',
+  deleted       TINYINT(1) DEFAULT 0 COMMENT '逻辑删除 0未删 1已删',
+  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX idx_status (status),
+  INDEX idx_category (category),
+  INDEX idx_distance (distance_km)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商位表';
--- 追加字段
-ALTER TABLE mall_merchant
-    ADD COLUMN comment_num  INT          DEFAULT 0 COMMENT '评论数',
-    ADD COLUMN category     VARCHAR(32)  COMMENT '经营类别',
-    ADD COLUMN distance_km  VARCHAR(32) COMMENT '距离(km)',
-    ADD COLUMN parking      VARCHAR(32)   DEFAULT 0 COMMENT '停车便利',
-    ADD COLUMN open_day     VARCHAR(10)   DEFAULT 0 COMMENT '24小时营业',
-    ADD COLUMN rank_text    VARCHAR(64)  COMMENT '榜单描述';
-    ADD COLUMN address_abbr VARCHAR(32) COMMENT '地址简称' AFTER address;
-    ADD COLUMN slogan       VARCHAR(100) COMMENT '商品标语' AFTER name,
-    ADD COLUMN sales_tag    VARCHAR(20)  COMMENT '销量标签' AFTER month_sales,
-    ADD COLUMN stock        VARCHAR(10)  DEFAULT '0' COMMENT '库存数量（字符串）' AFTER price,
-    ADD COLUMN discount     VARCHAR(5)   DEFAULT '1' COMMENT '折扣系数字符串，如 0.88' AFTER discount_price;
-    ADD COLUMN deleted TINYINT(1) DEFAULT 0 COMMENT '逻辑删除 0未删 1已删';
-    ADD COLUMN delivery_type VARCHAR(10) DEFAULT '外卖' COMMENT '到店/外卖/其他';
-    ADD COLUMN merchant_logo VARCHAR(255) COMMENT '商位logo（URL或路径）';
-    ADD COLUMN is_hide	TINYINT(1)   DEFAULT 0 COMMENT '是否隐藏 1是 0否';
 
 
--- 顺手建几个常用的索引
-ALTER TABLE mall_merchant
-    ADD INDEX idx_category (category),
-    ADD INDEX idx_distance (distance_km);
-
-
--- 商品表
+-- 商品表（合并所有字段）
 CREATE TABLE mall_product (
-  id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
-  merchant_id   BIGINT NOT NULL COMMENT '所属商位ID',
-  name          VARCHAR(100) NOT NULL COMMENT '商品名称',
-  cover_img     VARCHAR(255) COMMENT '商品图',
-  price         DECIMAL(8,2) NOT NULL COMMENT '原价',
+  id             BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+  merchant_id    BIGINT NOT NULL COMMENT '所属商位ID',
+  name           VARCHAR(100) NOT NULL COMMENT '商品名称',
+  cover_img      VARCHAR(255) COMMENT '商品图',
+  price          DECIMAL(8,2) NOT NULL COMMENT '原价',
+  stock          VARCHAR(10) DEFAULT '0' COMMENT '库存数量（字符串）',
   discount_price DECIMAL(8,2) COMMENT '折扣价',
-  month_sales   INT DEFAULT 0 COMMENT '月售',
-  status        TINYINT(1) DEFAULT 1 COMMENT '上架状态',
-  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
-  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  discount       VARCHAR(5) DEFAULT '1' COMMENT '折扣系数字符串，如 0.88',
+  month_sales    INT DEFAULT 0 COMMENT '月售',
+  sales_tag      VARCHAR(20) COMMENT '销量标签',
+  status         TINYINT(1) DEFAULT 1 COMMENT '上架状态',
+  deleted        TINYINT(1) DEFAULT 0 COMMENT '逻辑删除',
+  create_time    DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   INDEX idx_merchant (merchant_id),
   INDEX idx_status (status),
   CONSTRAINT fk_product_merchant FOREIGN KEY (merchant_id) REFERENCES mall_merchant(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
 
-ALTER TABLE mall_product ADD COLUMN deleted TINYINT(1) DEFAULT 0 COMMENT '逻辑删除';
 
--- 订单表
+-- 订单表（合并所有字段）
 CREATE TABLE mall_order (
-  id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '订单主键',
-  order_no      VARCHAR(64)  NOT NULL COMMENT '订单号（唯一）',
-  user_id       BIGINT       NOT NULL COMMENT '下单用户ID',
-  total_amount  DECIMAL(10,2) NOT NULL COMMENT '订单实付总额',
-  address       VARCHAR(255) NOT NULL COMMENT '送餐地址',
-  phone         VARCHAR(20)  NOT NULL COMMENT '手机号',
-  remark        VARCHAR(255) COMMENT '备注',
-  status        TINYINT(1) DEFAULT 0 COMMENT '0待支付 1已支付 2已取消',
-  deleted       TINYINT(1) DEFAULT 0 COMMENT '逻辑删除',
-  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
-  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  id             BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '订单主键',
+  order_no       VARCHAR(64)  NOT NULL COMMENT '订单号（唯一）',
+  user_id        BIGINT       NOT NULL COMMENT '下单用户ID',
+  merchant_id    BIGINT       NULL COMMENT '商位ID',
+  total_amount   DECIMAL(10,2) NOT NULL COMMENT '订单实付总额',
+  address        VARCHAR(255) NOT NULL COMMENT '送餐地址',
+  phone          VARCHAR(20)  NOT NULL COMMENT '手机号',
+  remark         VARCHAR(255) COMMENT '备注',
+  status         TINYINT(1) DEFAULT 0 COMMENT '0待支付 1已支付 2已取消',
+  pay_time       DATETIME COMMENT '支付时间',
+  transaction_id VARCHAR(64) COMMENT '微信支付订单号',
+  deleted        TINYINT(1) DEFAULT 0 COMMENT '逻辑删除',
+  create_time    DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   INDEX idx_order_no (order_no),
-  INDEX idx_user_id (user_id)
+  INDEX idx_user_id (user_id),
+  INDEX idx_order_d_m_s_t (deleted, merchant_id, status, create_time DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
 
-ALTER TABLE mall_order
-  ADD COLUMN pay_time DATETIME COMMENT '支付时间',
-  ADD COLUMN transaction_id VARCHAR(64) COMMENT '微信支付订单号';
-  ADD COLUMN merchant_id BIGINT NULL COMMENT '商位ID';
 
--- 复合索引：逻辑删除 + 商位 + 状态 + 时间
-CREATE INDEX idx_order_d_m_s_t
-ON mall_order (deleted, merchant_id, status, create_time DESC);
-
-
+-- 订单明细表
 CREATE TABLE mall_order_item (
   id            BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '明细主键',
   order_id      BIGINT NOT NULL COMMENT '订单主表ID',
@@ -435,10 +421,171 @@ CREATE TABLE mall_order_item (
   unit_price    DECIMAL(8,2) NOT NULL COMMENT '商品当时单价',
   total_price   DECIMAL(8,2) NOT NULL COMMENT '本行小计',
   deleted       TINYINT(1) DEFAULT 0 COMMENT '逻辑删除',
-  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP,
-  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  create_time   DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   INDEX idx_order_id (order_id),
   INDEX idx_product_id (product_id),
   CONSTRAINT fk_item_order  FOREIGN KEY (order_id)   REFERENCES mall_order(id),
   CONSTRAINT fk_item_product FOREIGN KEY (product_id) REFERENCES mall_product(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单明细表';
+
+-- ========================================
+-- 追加：约赛表、直播表、裁判表、商品表、订单表的初始化数据
+-- 创建时间：2026-05-18
+-- ========================================
+
+-- ========================================
+-- 1. 比赛表测试数据 (sta_game)
+-- ========================================
+INSERT INTO sta_game (home_name, away_name, game_type, homeid, awayid, hteam_score, vteam_score, league_id, playing_time, game_round, game_addr, game_status, game_stage, venue_name, home_color, away_color, home_paused, away_paused, home_fouls, away_fouls, hsessions_score, asessions_score, create_time, update_time) VALUES
+('北京首钢', '广东宏远', 'CBA', 1, 2, 95, 98, 1, '2026-05-20 19:30:00', '第15轮', 1, 0, '常规赛', '五棵松体育馆', '红色', '蓝色', 2, 3, 8, 10, '25,30,20,20', '28,28,22,20', NOW(), NOW()),
+('辽宁本钢', '新疆广汇', 'CBA', 3, 4, 102, 99, 1, '2026-05-21 19:30:00', '第16轮', 2, 0, '常规赛', '辽宁体育馆', '蓝白色', '红色', 1, 2, 5, 6, '30,25,22,25', '28,24,23,24', NOW(), NOW()),
+('上海久事', '浙江稠州', 'CBA', 5, 6, 88, 92, 1, '2026-05-22 19:30:00', '第17轮', 3, 0, '常规赛', '梅赛德斯-奔驰文化中心', '白色', '绿色', 3, 2, 7, 8, '22,20,23,23', '25,22,22,23', NOW(), NOW());
+
+-- ========================================
+-- 2. 裁判表测试数据 (sta_referee_info)
+-- ========================================
+INSERT INTO sta_referee_info (name, avatar, level, cert_date, reg_unit, signature, status, remark, order_count, schedule_log, referee_years, price, create_time, update_time) VALUES
+('张伟', '/uploads/referee/avatar1.jpg', '国家级裁判', '2018-06-15', '中国篮球协会', 'zhangwei', '1', '资深裁判，经验丰富', 120, '[{\"date\":\"2026-05-20\",\"available\":true},{\"date\":\"2026-05-21\",\"available\":false}]', 15, '500.00', NOW(), NOW()),
+('李明', '/uploads/referee/avatar2.jpg', '国际级裁判', '2015-03-20', '国际篮联', 'liming', '1', '国际级裁判，执裁过奥运会', 200, '[{\"date\":\"2026-05-20\",\"available\":true},{\"date\":\"2026-05-21\",\"available\":true}]', 20, '800.00', NOW(), NOW()),
+('王强', '/uploads/referee/avatar3.jpg', '国家级裁判', '2019-08-10', '中国篮球协会', 'wangqiang', '1', '年轻裁判，潜力巨大', 80, '[{\"date\":\"2026-05-20\",\"available\":false},{\"date\":\"2026-05-21\",\"available\":true}]', 8, '400.00', NOW(), NOW());
+
+-- ========================================
+-- 3. 直播表 (sta_live_person) - 创建新表和数据
+-- ========================================
+DROP TABLE IF EXISTS `sta_live_person`;
+CREATE TABLE `sta_live_person` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(50) NOT NULL COMMENT '直播人员姓名',
+  `avatar_url` varchar(255) DEFAULT NULL COMMENT '直播人员头像URL',
+  `qualification` varchar(200) DEFAULT NULL COMMENT '直播资质描述',
+  `friend_price` decimal(10,2) DEFAULT NULL COMMENT '亲友价（元/队）',
+  `live_count` int DEFAULT '0' COMMENT '直播场次总数',
+  `content_desc` varchar(500) DEFAULT NULL COMMENT '直播内容描述',
+  `status` int DEFAULT '1' COMMENT '直播人员状态 0-禁用 1-启用',
+  `is_hide` tinyint(1) DEFAULT '0' COMMENT '是否隐藏 0否 1是',
+  `schedule_log` text COMMENT '日程日志(JSON格式)',
+  `deleted` int DEFAULT '0' COMMENT '逻辑删除 0-未删 1-已删',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='直播人员信息表';
+
+INSERT INTO sta_live_person (name, avatar_url, qualification, friend_price, live_count, content_desc, status, is_hide, schedule_log, deleted, create_time, update_time) VALUES
+('刘洋', '/uploads/live/avatar1.jpg', '资深直播数据员，10年经验', 300.00, 350, '全场直播、统计全队数据、个人集锦', 1, 0, '[{\"date\":\"2026-05-20\",\"available\":true},{\"date\":\"2026-05-21\",\"available\":true}]', 0, NOW(), NOW()),
+('陈静', '/uploads/live/avatar2.jpg', '专业直播解说员，CBA官方认证', 400.00, 280, '专业解说、实时数据分析、精彩回放', 1, 0, '[{\"date\":\"2026-05-20\",\"available\":false},{\"date\":\"2026-05-21\",\"available\":true}]', 0, NOW(), NOW()),
+('赵磊', '/uploads/live/avatar3.jpg', '新媒体直播达人，粉丝10万+', 250.00, 150, '趣味解说、互动直播、短视频制作', 1, 0, '[{\"date\":\"2026-05-20\",\"available\":true},{\"date\":\"2026-05-21\",\"available\":false}]', 0, NOW(), NOW());
+
+-- ========================================
+-- 4. 约赛表数据 (sta_organize_game)
+-- ========================================
+INSERT INTO sta_organize_game (team_id, team_name, game_date, game_time, uniform, fee, referee, level, venue, contact, remark, create_time, update_time) VALUES
+(1, '北京首钢青年队', '2026-05-25', '14:00-16:00', '红色', '500', '张伟', '业余', '五棵松训练馆', '13800138001', '热身赛', NOW(), NOW()),
+(2, '广东宏远青年队', '2026-05-26', '15:00-17:00', '蓝色', '600', '李明', '职业', '广东宏远训练基地', '13900139002', '友谊赛', NOW(), NOW()),
+(3, '上海久事预备队', '2026-05-27', '10:00-12:00', '白色', '400', '王强', '业余', '上海体育学院', '13700137003', NULL, NOW(), NOW());
+
+-- ========================================
+-- 5. 商位表测试数据 (mall_merchant)
+-- ========================================
+INSERT INTO mall_merchant (name, address, address_abbr, phone, open_time, status, cover_img, score, comment_num, category, distance_km, parking, open_day, rank_text, delivery_type, merchant_logo, is_hide, deleted, create_time, update_time) VALUES
+('运动装备专营店', '北京市朝阳区体育中心B1层', '体育中心B1', '010-88888888', '09:00-21:00', 1, '/uploads/merchant/cover1.jpg', '4.8', 256, '运动装备', '1.2', '1', '0', '运动装备销量冠军', '到店/外卖', '/uploads/merchant/logo1.jpg', 0, 0, NOW(), NOW()),
+('篮球用品旗舰店', '上海市浦东新区陆家嘴', '陆家嘴', '021-66666666', '10:00-22:00', 1, '/uploads/merchant/cover2.jpg', '4.9', 389, '篮球用品', '2.5', '1', '0', '篮球用品TOP1', '到店', '/uploads/merchant/logo2.jpg', 0, 0, NOW(), NOW()),
+('运动服饰精品店', '广州市天河区体育西路', '体育西路', '020-77777777', '09:00-20:00', 1, '/uploads/merchant/cover3.jpg', '4.7', 180, '运动服饰', '0.8', '0', '0', '运动服饰精选', '外卖', '/uploads/merchant/logo3.jpg', 0, 0, NOW(), NOW());
+
+-- ========================================
+-- 6. 商品表测试数据 (mall_product)
+-- ========================================
+INSERT INTO mall_product (merchant_id, name, cover_img, price, discount_price, month_sales, status, deleted, create_time, update_time) VALUES
+(1, '专业篮球鞋-乔丹系列', '/uploads/product/shoe1.jpg', 1299.00, 999.00, 580, 1, 0, NOW(), NOW()),
+(1, '篮球护膝-专业级', '/uploads/product/knee1.jpg', 199.00, 149.00, 320, 1, 0, NOW(), NOW()),
+(2, '篮球-斯伯丁TF-1000', '/uploads/product/ball1.jpg', 399.00, 299.00, 450, 1, 0, NOW(), NOW()),
+(2, '运动T恤-透气速干', '/uploads/product/shirt1.jpg', 159.00, 99.00, 680, 1, 0, NOW(), NOW()),
+(3, '运动毛巾-超吸水', '/uploads/product/towel1.jpg', 49.00, 29.00, 890, 1, 0, NOW(), NOW()),
+(3, '运动水壶-大容量', '/uploads/product/bottle1.jpg', 89.00, 59.00, 520, 1, 0, NOW(), NOW());
+
+-- ========================================
+-- 7. 裁判订单表 (mall_referee_order)
+-- ========================================
+DROP TABLE IF EXISTS `mall_referee_order`;
+CREATE TABLE `mall_referee_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `order_no` varchar(50) NOT NULL COMMENT '订单号（格式：RF+时间戳）',
+  `referee_id` bigint NOT NULL COMMENT '裁判ID',
+  `referee_name` varchar(50) DEFAULT NULL COMMENT '裁判姓名',
+  `referee_level` varchar(50) DEFAULT NULL COMMENT '裁判等级',
+  `contact_name` varchar(50) NOT NULL COMMENT '联系人姓名',
+  `contact_phone` varchar(20) NOT NULL COMMENT '联系人电话',
+  `match_info` varchar(200) DEFAULT NULL COMMENT '比赛信息',
+  `match_time` varchar(50) DEFAULT NULL COMMENT '比赛时间',
+  `match_location` varchar(200) DEFAULT NULL COMMENT '比赛地点',
+  `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额（单位：元）',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `status` int DEFAULT '0' COMMENT '订单状态 0-未付款 1-已付款 2-已取消 3-已完成',
+  `transaction_id` varchar(100) DEFAULT NULL COMMENT '微信支付官方订单号',
+  `pay_time` datetime DEFAULT NULL COMMENT '支付时间',
+  `deleted` int DEFAULT '0' COMMENT '逻辑删除 0-未删 1-已删',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_no` (`order_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='裁判订单表';
+
+INSERT INTO mall_referee_order (order_no, referee_id, referee_name, referee_level, contact_name, contact_phone, match_info, match_time, match_location, total_amount, remark, status, transaction_id, pay_time, deleted, create_time, update_time) VALUES
+('RF20260518001', 1, '张伟', '国家级裁判', '李华', '13800138001', '北京首钢 vs 广东宏远', '2026-05-20 19:30:00', '五棵松体育馆', 500.00, '请提前30分钟到场', 1, 'wx123456789', NOW(), 0, NOW(), NOW()),
+('RF20260518002', 2, '李明', '国际级裁判', '王芳', '13900139002', '辽宁本钢 vs 新疆广汇', '2026-05-21 19:30:00', '辽宁体育馆', 800.00, NULL, 0, NULL, NULL, 0, NOW(), NOW()),
+('RF20260518003', 3, '王强', '国家级裁判', '张强', '13700137003', '上海久事 vs 浙江稠州', '2026-05-22 19:30:00', '梅赛德斯-奔驰文化中心', 400.00, '需要提供专业设备', 3, 'wx987654321', NOW(), 0, NOW(), NOW());
+
+-- ========================================
+-- 8. 直播订单表 (mall_live_person_order)
+-- ========================================
+DROP TABLE IF EXISTS `mall_live_person_order`;
+CREATE TABLE `mall_live_person_order` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `order_no` varchar(50) NOT NULL COMMENT '订单号（格式：LP+时间戳）',
+  `live_person_id` bigint NOT NULL COMMENT '直播人员ID',
+  `live_person_name` varchar(50) DEFAULT NULL COMMENT '直播人员姓名',
+  `qualification` varchar(200) DEFAULT NULL COMMENT '直播人员资质描述',
+  `contact_name` varchar(50) NOT NULL COMMENT '联系人姓名',
+  `contact_phone` varchar(20) NOT NULL COMMENT '联系人电话',
+  `match_info` varchar(200) DEFAULT NULL COMMENT '比赛信息',
+  `match_time` varchar(50) DEFAULT NULL COMMENT '比赛时间',
+  `match_location` varchar(200) DEFAULT NULL COMMENT '比赛地点',
+  `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额（单位：元）',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `status` int DEFAULT '0' COMMENT '订单状态 0-未付款 1-已付款 2-已取消 3-已完成',
+  `transaction_id` varchar(100) DEFAULT NULL COMMENT '微信支付官方订单号',
+  `pay_time` datetime DEFAULT NULL COMMENT '支付时间',
+  `deleted` int DEFAULT '0' COMMENT '逻辑删除 0-未删 1-已删',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_no` (`order_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='直播订单表';
+
+INSERT INTO mall_live_person_order (order_no, live_person_id, live_person_name, qualification, contact_name, contact_phone, match_info, match_time, match_location, total_amount, remark, status, transaction_id, pay_time, deleted, create_time, update_time) VALUES
+('LV20260518001', 1, '刘洋', '资深直播数据员，10年经验', '李华', '13800138001', '北京首钢 vs 广东宏远', '2026-05-20 19:30:00', '五棵松体育馆', 300.00, '需要全程直播', 1, 'wx111222333', NOW(), 0, NOW(), NOW()),
+('LV20260518002', 2, '陈静', '专业直播解说员，CBA官方认证', '王芳', '13900139002', '辽宁本钢 vs 新疆广汇', '2026-05-21 19:30:00', '辽宁体育馆', 400.00, NULL, 0, NULL, NULL, 0, NOW(), NOW()),
+('LV20260518003', 3, '赵磊', '新媒体直播达人，粉丝10万+', '张强', '13700137003', '上海久事 vs 浙江稠州', '2026-05-22 19:30:00', '梅赛德斯-奔驰文化中心', 250.00, '需要短视频制作', 2, 'wx444555666', NOW(), 0, NOW(), NOW());
+
+-- ========================================
+-- 9. 商品订单表测试数据 (mall_order)
+-- ========================================
+INSERT INTO mall_order (order_no, user_id, total_amount, address, phone, remark, status, merchant_id, transaction_id, pay_time, deleted, create_time, update_time) VALUES
+('YL20260518001', 9527, 1098.00, '北京市朝阳区建国路88号', '13800138001', '请尽快发货', 1, 1, 'wx777888999', NOW(), 0, NOW(), NOW()),
+('YL20260518002', 9528, 398.00, '上海市浦东新区陆家嘴环路1000号', '13900139002', NULL, 0, 2, NULL, NULL, 0, NOW(), NOW()),
+('YL20260518003', 9529, 88.00, '广州市天河区体育西路188号', '13700137003', '周末配送', 4, 3, 'wx000111222', NOW(), 0, NOW(), NOW());
+
+-- ========================================
+-- 10. 商品订单明细表测试数据 (mall_order_item)
+-- ========================================
+INSERT INTO mall_order_item (order_id, product_id, product_name, quantity, unit_price, total_price, deleted, create_time, update_time) VALUES
+(1, 1, '专业篮球鞋-乔丹系列', 1, 999.00, 999.00, 0, NOW(), NOW()),
+(2, 2, '篮球护膝-专业级', 1, 99.00, 99.00, 0, NOW(), NOW()),
+(3, 3, '篮球-斯伯丁TF-1000', 1, 299.00, 299.00, 0, NOW(), NOW()),
+(4, 4, '运动T恤-透气速干', 1, 99.00, 99.00, 0, NOW(), NOW()),
+(5, 5, '运动毛巾-超吸水', 1, 29.00, 29.00, 0, NOW(), NOW()),
+(6, 6, '运动水壶-大容量', 1, 59.00, 59.00, 0, NOW(), NOW());
+
+-- ========================================
+-- 初始化完成
+-- ========================================

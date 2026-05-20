@@ -1,6 +1,9 @@
 package com.ruoyi.project.live.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.project.common.util.ScheduleLogUtil;
+import com.ruoyi.project.game.address.domain.GameAddress;
+import com.ruoyi.project.game.address.service.GameAddressService;
 import com.ruoyi.project.live.domain.LivePerson;
 import com.ruoyi.project.live.mapper.LivePersonMapper;
 import com.ruoyi.project.live.service.LivePersonService;
@@ -11,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 直播人员信息Service实现类
@@ -20,6 +26,9 @@ import java.util.List;
 @Service
 public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePerson> implements LivePersonService {
 
+    @Autowired
+    private GameAddressService gameAddressService;
+    
     //文件上传路径
     @Value("${spring.upload.path}")
     private String uploadImgPath;
@@ -37,7 +46,7 @@ public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePer
             livePerson.setStatus(1); // 默认启用
         }
         if (livePerson.getIsHide() == null) {
-            livePerson.setIsHide(0); // 默认不隐藏
+            livePerson.setIsHide(false); // 默认不隐藏
         }
         if (livePerson.getLiveCount() == null) {
             livePerson.setLiveCount(0); // 默认直播场次为0
@@ -91,7 +100,15 @@ public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePer
      */
     @Override
     public LivePerson getLivePersonById(Long id) {
-        return getById(id);
+        LivePerson livePerson = getById(id);
+        if (livePerson != null) {
+            // 处理可用时间段
+            handleAvailableTime(livePerson);
+            
+            // 添加场地信息
+            addPitchInfo(livePerson);
+        }
+        return livePerson;
     }
 
     /**
@@ -115,5 +132,27 @@ public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePer
                 .eq(LivePerson::getStatus, 1)
                 .eq(LivePerson::getIsHide, 0)
                 .list();
+    }
+    
+    /**
+     * 处理直播人员的可用时间段（使用通用工具类）
+     */
+    private void handleAvailableTime(LivePerson livePerson) {
+        List<Map<String, Object>> availableTimeList = ScheduleLogUtil.handleAvailableTime(livePerson.getScheduleLog());
+        livePerson.setAvailableTime(availableTimeList);
+    }
+    
+    /**
+     * 添加场地信息到直播人员对象
+     */
+    private void addPitchInfo(LivePerson livePerson) {
+        List<GameAddress> addresses = gameAddressService.getAllGameAddresses();
+        List<Map<String, String>> pitchList = new ArrayList<>();
+        for (GameAddress address : addresses) {
+            Map<String, String> pitchMap = new HashMap<>();
+            pitchMap.put("venueName", address.getVenueName());
+            pitchList.add(pitchMap);
+        }
+        livePerson.setPitch(pitchList);
     }
 }

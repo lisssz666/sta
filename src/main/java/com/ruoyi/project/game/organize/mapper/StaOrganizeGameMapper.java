@@ -40,4 +40,11 @@ public interface StaOrganizeGameMapper extends BaseMapper<StaOrganizeGameEntity>
      * @return 组织比赛信息
      */
     StaOrganizeGameEntity selectById(Long id);
+    
+    /**
+     * 根据ID更新组织比赛信息
+     * @param entity 组织比赛信息
+     * @return 影响行数
+     */
+    int updateById(@Param("entity") StaOrganizeGameEntity entity);
 }

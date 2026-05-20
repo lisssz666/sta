@@ -18,5 +18,15 @@ public interface MallOrderService {
     MallOrder getOrderById(Long id);
     /** 根据参数查询订单列表 */
     List<OrderListVO> listOrdersNoPage(Long merchantId,String phone,String status);
+    
+    /** 查询所有订单 */
+    List<OrderListVO> findAll();
+    
     MallOrder createOrder(CreateOrderDTO dto);
+    
+    /** 根据ID查询订单VO */
+    OrderListVO getOrderVOById(Long id);
+    
+    /** 取消订单 */
+    boolean cancelOrder(Long id);
 }

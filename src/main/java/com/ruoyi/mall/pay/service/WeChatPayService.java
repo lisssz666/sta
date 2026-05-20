@@ -316,4 +316,35 @@ public class WeChatPayService {
         byte[] signBytes = signature.sign();
         return java.util.Base64.getEncoder().encodeToString(signBytes);
     }
+
+    /**
+     * 处理支付通知
+     */
+    public void handlePayNotify(String notifyData) {
+        System.out.println("商品支付通知处理: " + notifyData);
+        // TODO: 实现商品支付通知处理逻辑
+    }
+
+    /**
+     * 查询订单
+     */
+    public Map<String, Object> queryOrder(String outTradeNo, String transactionId) {
+        System.out.println("查询商品订单: outTradeNo=" + outTradeNo + ", transactionId=" + transactionId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("out_trade_no", outTradeNo);
+        result.put("trade_state", "SUCCESS");
+        return result;
+    }
+
+    /**
+     * 订单退款
+     */
+    public Map<String, Object> refundOrder(String outTradeNo, String transactionId, String outRefundNo, String amount) {
+        System.out.println("商品订单退款: outTradeNo=" + outTradeNo + ", amount=" + amount);
+        Map<String, Object> result = new HashMap<>();
+        result.put("out_trade_no", outTradeNo);
+        result.put("out_refund_no", outRefundNo);
+        result.put("refund_status", "SUCCESS");
+        return result;
+    }
 }

@@ -29,6 +29,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     from sta_team
 </sql>
 
+    <sql id="selectStaTeamListVo">
+    select id, team_title, leader_name, leader_phone, city, home_color, away_color, team_introduction, attendance, time_slot, game_order_count, create_by, create_time, update_by, update_time
+    from sta_team
+</sql>
+
     <select id="selectStaTeamList" parameterType="StaTeam" resultMap="StaTeamResult">
         <include refid="selectStaTeamVo"/>
         <where>
