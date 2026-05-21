@@ -29,9 +29,11 @@ public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePer
     @Autowired
     private GameAddressService gameAddressService;
     
-    //文件上传路径
     @Value("${spring.upload.path}")
     private String uploadImgPath;
+
+    @Value("${spring.upload.server}")
+    private String uploadServer;
 
     /**
      * 新增直播人员
@@ -102,6 +104,12 @@ public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePer
     public LivePerson getLivePersonById(Long id) {
         LivePerson livePerson = getById(id);
         if (livePerson != null) {
+            // 为直播人员头像路径拼接服务器地址
+            if (livePerson.getAvatarUrl() != null && !livePerson.getAvatarUrl().isEmpty()) {
+                if (!livePerson.getAvatarUrl().startsWith("http://") && !livePerson.getAvatarUrl().startsWith("https://")) {
+                    livePerson.setAvatarUrl(uploadServer + livePerson.getAvatarUrl());
+                }
+            }
             // 处理可用时间段
             handleAvailableTime(livePerson);
             
@@ -118,7 +126,16 @@ public class LivePersonServiceImpl extends ServiceImpl<LivePersonMapper, LivePer
      */
     @Override
     public List<LivePerson> listLivePersons() {
-        return list();
+        List<LivePerson> livePersonList = list();
+        // 为每个直播人员的头像路径拼接服务器地址
+        for (LivePerson livePerson : livePersonList) {
+            if (livePerson.getAvatarUrl() != null && !livePerson.getAvatarUrl().isEmpty()) {
+                if (!livePerson.getAvatarUrl().startsWith("http://") && !livePerson.getAvatarUrl().startsWith("https://")) {
+                    livePerson.setAvatarUrl(uploadServer + livePerson.getAvatarUrl());
+                }
+            }
+        }
+        return livePersonList;
     }
 
     /**
