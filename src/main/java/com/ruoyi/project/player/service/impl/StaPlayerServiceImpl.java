@@ -129,6 +129,17 @@ public class StaPlayerServiceImpl implements IStaPlayerService
         }
         staPlayer.setUpdateTime(DateUtils.getNowDate());
         
+        MultipartFile logo = staPlayer.getLogo();
+        if (logo != null)
+        {
+            try {
+                String path = FileUploadUtils.upload(uploadImgPath, logo);
+                staPlayer.setLogoPath(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
         MultipartFile insuranceCertificate = staPlayer.getInsuranceCertificate();
         if (insuranceCertificate != null)
         {

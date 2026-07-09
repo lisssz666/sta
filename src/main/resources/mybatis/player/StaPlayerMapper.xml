@@ -79,7 +79,7 @@
         update sta_player
         <trim prefix="SET" suffixOverrides=",">
             <if test="teamId != null">team_id = #{teamId},</if>
-            <if test="logo != null">logo = #{logo},</if>
+            <if test="logoPath != null">logo = #{logoPath},</if>
             <if test="name != null">name = #{name},</if>
             <if test="jerseyNumber != null">jersey_number = #{jerseyNumber},</if>
             <if test="weight != null">weight = #{weight},</if>

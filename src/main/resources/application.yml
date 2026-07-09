@@ -17,14 +17,15 @@ ruoyi:
 
 # 开发环境配置
 server:
-  # 服务器的HTTP端口，默认为8080
-#  port: 8094
-  port: 8088
+  port: 443
   ssl:
     key-store: classpath:ybyoulan.cn.pfx
     key-store-type: PKCS12
     key-store-password: 3ro46543n4mb
     key-alias: ybyoulan.cn
+    # 新增以下配置，解决 TLS 握手问题
+    enabled-protocols: TLSv1.2,TLSv1.3
+    ciphers: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
   servlet:
     # 应用的访问路径
     context-path: /

@@ -64,7 +64,7 @@ public class StaPlayerController extends BaseController
      * 修改运动员信息
      */
     @ApiOperation(value = "修改运动员信息")
-    @PutMapping("/edit")
+    @PostMapping("/edit")
     public AjaxResult edit(StaPlayer staPlayer)
     {
         return toAjax(staPlayerService.updateStaPlayer(staPlayer));
