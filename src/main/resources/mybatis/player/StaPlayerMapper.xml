@@ -14,6 +14,7 @@
         <result property="height"    column="height"    />
         <result property="position"    column="position"    />
         <result property="phoneNumber"    column="phone_number"    />
+        <result property="insuranceCertificatePath"    column="insurance_certificate"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -21,7 +22,7 @@
     </resultMap>
 
     <sql id="selectStaPlayerVo">
-        select id, team_id, logo, name, jersey_number, weight, height, position, phone_number, create_by, create_time, update_by, update_time
+        select id, team_id, logo, name, jersey_number, weight, height, position, phone_number, insurance_certificate, create_by, create_time, update_by, update_time
         from sta_player
     </sql>
 
@@ -32,7 +33,7 @@
             <if test="name != null and name != ''"> and name = #{name}</if>
             <if test="jerseyNumber != null and jerseyNumber != ''"> and jersey_number = #{jerseyNumber}</if>
         </where>
-        ORDER BY name = '其他' DESC, name;
+        ORDER BY FIELD(name, '其他') DESC, name
     </select>
 
     <select id="selectStaPlayerById" parameterType="Long" resultMap="StaPlayerResult">
@@ -51,6 +52,7 @@
             <if test="height != null">height,</if>
             <if test="position != null">position,</if>
             <if test="phoneNumber != null">phone_number,</if>
+            <if test="insuranceCertificatePath != null">insurance_certificate,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -65,6 +67,7 @@
             <if test="height != null">#{height},</if>
             <if test="position != null">#{position},</if>
             <if test="phoneNumber != null">#{phoneNumber},</if>
+            <if test="insuranceCertificatePath != null">#{insuranceCertificatePath},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -83,6 +86,7 @@
             <if test="height != null">height = #{height},</if>
             <if test="position != null">position = #{position},</if>
             <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="insuranceCertificatePath != null">insurance_certificate = #{insuranceCertificatePath},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

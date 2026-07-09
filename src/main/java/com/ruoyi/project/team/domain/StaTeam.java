@@ -65,6 +65,18 @@ public class StaTeam extends BaseEntity {
 
     /** 约赛成单总场次 */
     private String gameOrderCount;
+
+    /** 校验码 */
+    private String verifyCode;
+
+    /** 组别：0-全部，1-邀请组，2-公开组 */
+    private Integer groupType;
+
+    /** 人数 */
+    private Integer memberCount;
+
+    /** 联赛ID */
+    private Long leagueId;
 }
 
  

@@ -19,6 +19,18 @@ public interface MallOrderService {
     /** 根据参数查询订单列表 */
     List<OrderListVO> listOrdersNoPage(Long merchantId,String phone,String status);
     
+    /** 根据用户ID查询订单列表 */
+    List<OrderListVO> listOrdersByUserId(Long userId, Long merchantId, String phone, String status);
+    
+    /** 根据用户ID和订单ID查询订单VO */
+    OrderListVO getOrderVOByUserId(Long userId, Long orderId);
+    
+    /** 根据用户ID取消订单 */
+    boolean cancelOrderByUserId(Long userId, Long orderId);
+    
+    /** 根据用户ID删除订单 */
+    boolean removeOrderByUserId(Long userId, Long orderId);
+    
     /** 查询所有订单 */
     List<OrderListVO> findAll();
     

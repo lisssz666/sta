@@ -62,22 +62,29 @@ public class UnifiedOrderServiceImpl implements UnifiedOrderService {
     @Override
     public List<UnifiedOrderVO> listUnifiedOrders(UnifiedOrderQueryDTO queryDTO) {
         List<UnifiedOrderVO> allOrders = new ArrayList<>();
+        Long userId = queryDTO.getUserId();
 
-        // 查询裁判订单
+        // 查询裁判订单（带用户隔离）
         if (StringUtils.isEmpty(queryDTO.getOrderType()) || "REF".equals(queryDTO.getOrderType())) {
-            List<RefereeOrderVO> refereeOrders = refereeOrderService.listAll();
+            List<RefereeOrderVO> refereeOrders = userId != null 
+                ? refereeOrderService.listOrdersByUserId(userId, null, null, queryDTO.getStatus())
+                : refereeOrderService.listAll();
             allOrders.addAll(refereeOrders.stream().map(this::convertToUnifiedVO).collect(Collectors.toList()));
         }
 
-        // 查询直播订单
+        // 查询直播订单（带用户隔离）
         if (StringUtils.isEmpty(queryDTO.getOrderType()) || "LIVE".equals(queryDTO.getOrderType())) {
-            List<LivePersonOrderVO> liveOrders = livePersonOrderService.listAll();
+            List<LivePersonOrderVO> liveOrders = userId != null 
+                ? livePersonOrderService.listOrdersByUserId(userId, null, null, queryDTO.getStatus())
+                : livePersonOrderService.listAll();
             allOrders.addAll(liveOrders.stream().map(this::convertToUnifiedVO).collect(Collectors.toList()));
         }
 
-        // 查询商城订单
+        // 查询商城订单（带用户隔离）
         if (StringUtils.isEmpty(queryDTO.getOrderType()) || "MALL".equals(queryDTO.getOrderType())) {
-            List<OrderListVO> mallOrders = mallOrderService.findAll();
+            List<OrderListVO> mallOrders = userId != null 
+                ? mallOrderService.listOrdersByUserId(userId, null, null, queryDTO.getStatus() != null ? queryDTO.getStatus().toString() : null)
+                : mallOrderService.findAll();
             allOrders.addAll(mallOrders.stream().map(this::convertToUnifiedVO).collect(Collectors.toList()));
         }
 
@@ -103,8 +110,8 @@ public class UnifiedOrderServiceImpl implements UnifiedOrderService {
                     .collect(Collectors.toList());
         }
 
-        // 按创建时间降序排序
-        allOrders.sort(Comparator.comparing(UnifiedOrderVO::getCreateTime).reversed());
+        // 按创建时间降序排序（处理createTime为null的情况）
+        allOrders.sort(Comparator.comparing(UnifiedOrderVO::getCreateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
 
         return allOrders;
     }

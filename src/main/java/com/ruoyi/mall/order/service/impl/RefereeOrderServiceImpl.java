@@ -201,6 +201,66 @@ public class RefereeOrderServiceImpl extends ServiceImpl<RefereeOrderMapper, Ref
     }
 
     @Override
+    public List<RefereeOrderVO> listOrdersByUserId(Long userId, Long refereeId, String contactPhone, Integer status) {
+        // 1. 构建查询条件，添加用户ID过滤
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<RefereeOrder> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        if (refereeId != null) {
+            queryWrapper.eq("referee_id", refereeId);
+        }
+        if (contactPhone != null) {
+            queryWrapper.eq("contact_phone", contactPhone);
+        }
+        if (status != null) {
+            queryWrapper.eq("status", status);
+        }
+        queryWrapper.orderByDesc("create_time");
+        // 2. 查询订单列表
+        List<RefereeOrder> orderList = this.list(queryWrapper);
+        // 3. 转换为VO列表
+        return orderList.stream().map(this::convertToVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public RefereeOrderVO getOrderVOByUserId(Long userId, Long orderId) {
+        // 1. 查询订单（带用户ID过滤）
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<RefereeOrder> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        queryWrapper.eq("id", orderId);
+        queryWrapper.eq("user_id", userId);
+        RefereeOrder order = this.getOne(queryWrapper);
+        if (order == null) {
+            return null;
+        }
+        // 2. 转换为VO并添加裁判头像
+        return convertToVO(order);
+    }
+
+    @Override
+    public boolean cancelOrderByUserId(Long userId, Long orderId) throws Exception {
+        // 1. 查询订单（带用户ID过滤）
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<RefereeOrder> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        queryWrapper.eq("id", orderId);
+        queryWrapper.eq("user_id", userId);
+        RefereeOrder order = this.getOne(queryWrapper);
+        
+        if (order == null) {
+            throw new IllegalArgumentException("订单不存在或无权限访问");
+        }
+        
+        // 2. 调用原有的取消逻辑
+        return cancelOrder(orderId);
+    }
+
+    @Override
+    public boolean removeOrderByUserId(Long userId, Long orderId) {
+        // 删除订单（带用户ID过滤）
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<RefereeOrder> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        queryWrapper.eq("id", orderId);
+        queryWrapper.eq("user_id", userId);
+        return this.remove(queryWrapper);
+    }
+
+    @Override
     public List<RefereeOrderVO> listAll() {
         // 查询所有订单，按创建时间降序排序
         com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<RefereeOrder> queryWrapper = 

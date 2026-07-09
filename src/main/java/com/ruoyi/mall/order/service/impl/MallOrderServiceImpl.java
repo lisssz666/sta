@@ -357,4 +357,28 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         vo.setItems(items);
         return vo;
     }
+
+	@Override
+	public List<OrderListVO> listOrdersByUserId(Long userId, Long merchantId, String phone, String status) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'listOrdersByUserId'");
+	}
+
+	@Override
+	public OrderListVO getOrderVOByUserId(Long userId, Long orderId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getOrderVOByUserId'");
+	}
+
+	@Override
+	public boolean cancelOrderByUserId(Long userId, Long orderId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'cancelOrderByUserId'");
+	}
+
+	@Override
+	public boolean removeOrderByUserId(Long userId, Long orderId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'removeOrderByUserId'");
+	}
 }

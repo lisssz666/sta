@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.ruoyi.framework.datasource.DynamicDataSourceContextHolder.log;
+// import static com.ruoyi.framework.datasource.DynamicDataSourceContextHolder.log;
 
 /*
  * 验签 + 解密 + 业务处理类

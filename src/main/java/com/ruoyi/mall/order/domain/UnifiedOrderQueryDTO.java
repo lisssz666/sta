@@ -34,6 +34,11 @@ public class UnifiedOrderQueryDTO {
     private String contactName;
 
     /**
+     * 用户ID（用于用户隔离，用户只能查询自己的订单）
+     */
+    private Long userId;
+
+    /**
      * 页码
      */
     private Integer pageNum = 1;

@@ -17,12 +17,9 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.ip.IpUtils;
-import com.ruoyi.framework.manager.AsyncManager;
-import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.framework.redis.RedisCache;
 import com.ruoyi.framework.security.LoginUser;
-import com.ruoyi.project.red.domain.RedCaptcha;
-import com.ruoyi.project.red.service.IRedCaptchaService;
+
 import com.ruoyi.project.system.domain.SysUser;
 import com.ruoyi.project.system.service.ISysConfigService;
 import com.ruoyi.project.system.service.ISysUserService;
@@ -46,10 +43,6 @@ public class SysLoginService
 
     @Autowired
     private RedisCache redisCache;
-    
-    //mysql 验证码 替代 redis
-    @Autowired
-    private IRedCaptchaService redCaptchaService;
 
     @Autowired
     private ISysUserService userService;
@@ -115,14 +108,6 @@ public class SysLoginService
         if(enabledRedis) {
         	captcha = redisCache.getCacheObject(verifyKey);
         	redisCache.deleteObject(verifyKey);
-        }else {
-        	RedCaptcha redCaptcha = redCaptchaService.selectRedCaptchaByCaptchaKey(verifyKey);
-        	if(null!=redCaptcha) {
-                if (DateUtils.getNowDate().before(redCaptcha.getExpreationTime())) {
-                    captcha = redCaptcha.getCaptchaCode();
-                }
-                redCaptchaService.deleteRedCaptchaByCaptchaId(redCaptcha.getCaptchaId());
-            }
         }
         
         if (captcha == null)

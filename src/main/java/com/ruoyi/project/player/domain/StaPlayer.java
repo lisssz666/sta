@@ -40,15 +40,21 @@ public class StaPlayer extends BaseEntity
     private Integer jerseyNumber;
 
     /** 体重（kg） */
-    private Double weight;
+    private String weight;
 
     /** 身高（cm） */
-    private Double height;
+    private String height;
 
     /** 位置 */
     private String position;
 
     /** 手机号 */
     private String phoneNumber;
+
+    /** 保险证明 */
+    private MultipartFile insuranceCertificate;
+
+    /** 保险证明路径 */
+    private String insuranceCertificatePath;
 
 }

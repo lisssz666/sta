@@ -13,6 +13,8 @@ public class RefereeOrder {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String orderNo;
+    /** 用户ID */
+    private Long userId;
     private Long refereeId;
     private String refereeName;
     private String refereeLevel;

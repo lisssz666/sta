@@ -11,10 +11,6 @@ import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.framework.redis.RedisCache;
 import com.ruoyi.framework.security.LoginUser;
 import com.ruoyi.framework.security.LoginUserSql;
-import com.ruoyi.project.red.domain.RedCaptcha;
-import com.ruoyi.project.red.domain.RedUser;
-import com.ruoyi.project.red.service.IRedCaptchaService;
-import com.ruoyi.project.red.service.IRedUserService;
 import com.ruoyi.project.system.domain.SysUser;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
@@ -63,12 +59,6 @@ public class TokenService {
     @Autowired
     private RedisCache redisCache;
 
-    @Autowired
-    private IRedCaptchaService redCaptchaService;
-
-    @Autowired
-    private IRedUserService redUserService;
-
     /**
      * 获取用户身份信息
      *
@@ -88,14 +78,7 @@ public class TokenService {
                     user = redisCache.getCacheObject(userKey);
                 } else {
                     LoginUserSql userSql = new LoginUserSql();
-                    RedUser redUser = redUserService.selectRedUserByUserKey(userKey);
-                    if (null != redUser) {
-                        user = JSON.parseObject(redUser.getLogininfo(), LoginUser.class);
-                        SysUser sysUser = JSON.parseObject(redUser.getSysuser(), SysUser.class);
-                        Set<String> per = JSON.parseObject(redUser.getPermissions(), Set.class);
-                        user.setUser(sysUser);
-                        user.setPermissions(per);
-                    }
+            
                 }
                 return user;
             } catch (Exception e) {
@@ -121,9 +104,7 @@ public class TokenService {
             String userKey = getTokenKey(token);
             if (enabledRedis) {
                 redisCache.deleteObject(userKey);
-            } else {
-                redUserService.deleteRedUserByUserKey(userKey);
-            }
+            } 
         }
     }
 
@@ -167,31 +148,6 @@ public class TokenService {
         loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
         // 根据uuid将loginUser缓存
         String userKey = getTokenKey(loginUser.getToken());
-
-        if (!enabledRedis) {
-            redUserService.deleteRedUserByUserId(loginUser.getUserId());
-
-            SysUser sysUser = loginUser.getUser();
-            Set<String> pre = loginUser.getPermissions();
-            LoginUser user = loginUser;
-            user.setUser(new SysUser());
-            user.setPermissions(null);
-
-            RedUser redUser = new RedUser();
-            redUser.setUserId(user.getUserId());
-            redUser.setUserKey(userKey);
-            redUser.setSysuser(JSON.toJSONString(sysUser));
-            redUser.setLogininfo(JSON.toJSONString(user));
-            redUser.setPermissions(JSON.toJSONString(pre));
-            redUser.setCreateTime(DateUtils.getNowDate());
-            redUser.setCreateBy("sys");
-            Date expreationTime = new Date(loginUser.getExpireTime());
-            redUser.setExpreationTime(expreationTime);
-            redUser.setCaptchaExpiration(0);
-            redUserService.insertRedUser(redUser);
-        } else {
-            redisCache.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
-        }
 
     }
 

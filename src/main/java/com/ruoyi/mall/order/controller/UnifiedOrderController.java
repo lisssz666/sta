@@ -1,5 +1,6 @@
 package com.ruoyi.mall.order.controller;
 
+import com.ruoyi.common.utils.TokenUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +53,32 @@ public class UnifiedOrderController extends BaseController {
 
     @Autowired
     private UnifiedOrderService unifiedOrderService;
+
+    /**
+     * 从请求中获取用户ID
+     * 优先从请求头的Authorization token中解析，其次从请求参数userId中获取
+     *
+     * @param request HTTP请求
+     * @param userIdParam URL参数中的userId
+     * @return 用户ID，如果无法获取返回null
+     */
+    private Long getUserId(HttpServletRequest request, Long userIdParam) {
+        // 1. 优先从URL参数获取
+        if (userIdParam != null && userIdParam > 0) {
+            return userIdParam;
+        }
+
+        // 2. 从请求头的Authorization获取token
+        String token = request.getHeader("Authorization");
+        if (StringUtils.hasText(token)) {
+            Long userId = TokenUtil.getUserIdFromToken(token);
+            if (userId != null) {
+                return userId;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * 创建订单
@@ -113,17 +142,27 @@ public class UnifiedOrderController extends BaseController {
     /**
      * 删除订单
      * <p>
-     * 支持三种订单类型的统一删除接口（软删除）
+     * 支持三种订单类型的统一删除接口（软删除），用户只能删除自己的订单
      * </p>
      *
      * @param orderType 订单类型（必填）REF/LIVE/MALL
      * @param id 订单 ID（必填）
+     * @param userId 用户ID（可选，优先从token解析）
+     * @param request HTTP请求（用于获取token）
      * @return 删除结果
      */
     @DeleteMapping("/delete")
     public AjaxResult deleteOrder(@RequestParam String orderType,
-                                  @RequestParam Long id) {
+                                  @RequestParam Long id,
+                                  @RequestParam(required = false) Long userId,
+                                  HttpServletRequest request) {
         try {
+            // 获取用户ID
+            Long currentUserId = getUserId(request, userId);
+            if (currentUserId == null) {
+                return AjaxResult.error("用户未登录");
+            }
+
             // 1. 参数校验
             if (!validateOrderType(orderType)) {
                 return AjaxResult.error("不支持的订单类型");
@@ -136,13 +175,13 @@ public class UnifiedOrderController extends BaseController {
             boolean success;
             switch (orderType) {
                 case ORDER_TYPE_REF:
-                    success = refereeOrderService.removeOrderById(id);
+                    success = refereeOrderService.removeOrderByUserId(currentUserId, id);
                     break;
                 case ORDER_TYPE_LIVE:
-                    success = livePersonOrderService.removeOrderById(id);
+                    success = livePersonOrderService.removeOrderByUserId(currentUserId, id);
                     break;
                 case ORDER_TYPE_MALL:
-                    success = mallOrderService.removeOrderById(id);
+                    success = mallOrderService.removeOrderByUserId(currentUserId, id);
                     break;
                 default:
                     success = false;
@@ -208,74 +247,29 @@ public class UnifiedOrderController extends BaseController {
     }
 
     /**
-     * 订单列表查询
-     * <p>
-     * 支持三种订单类型的统一查询接口
-     * </p>
-     *
-     * @param orderType 订单类型（必填）
-     * @param params 查询参数（可选，根据订单类型不同而不同）
-     * @return 订单列表
-     */
-    @GetMapping("/list")
-    public TableDataInfo listOrders(@RequestParam String orderType,
-                                    @RequestParam(required = false) String params) {
-        try {
-            startPage();
-            // 1. 参数校验
-            if (!validateOrderType(orderType)) {
-                return getDataTable(new java.util.ArrayList<>());
-            }
-
-            // 2. 根据订单类型调用不同的查询逻辑
-            List<?> list;
-            switch (orderType) {
-                case ORDER_TYPE_REF:
-                    // 裁判订单列表
-                    Long refereeId = getLongParam(params, "refereeId");
-                    String contactPhone = getStringParam(params, "contactPhone");
-                    Integer status = getIntParam(params, "status");
-                    list = refereeOrderService.listOrdersNoPage(refereeId, contactPhone, status);
-                    break;
-                case ORDER_TYPE_LIVE:
-                    // 直播订单列表
-                    Long livePersonId = getLongParam(params, "livePersonId");
-                    String contactPhoneLive = getStringParam(params, "contactPhone");
-                    Integer statusLive = getIntParam(params, "status");
-                    list = livePersonOrderService.listOrdersNoPage(livePersonId, contactPhoneLive, statusLive);
-                    break;
-                case ORDER_TYPE_MALL:
-                    // 商品订单列表
-                    Long merchantId = getLongParam(params, "merchantId");
-                    String phone = getStringParam(params, "phone");
-                    String statusMall = getStringParam(params, "status");
-                    list = mallOrderService.listOrdersNoPage(merchantId, phone, statusMall);
-                    break;
-                default:
-                    throw new IllegalArgumentException("不支持的订单类型");
-            }
-
-            return getDataTable(list);
-
-        } catch (Exception e) {
-            return getDataTable(new java.util.ArrayList<>());
-        }
-    }
-
-    /**
      * 订单详情查询
      * <p>
-     * 支持三种订单类型的统一详情查询接口
+     * 支持三种订单类型的统一详情查询接口，用户只能查询自己的订单
      * </p>
      *
      * @param orderType 订单类型（必填）
      * @param id 订单 ID（必填）
+     * @param userId 用户ID（可选，优先从token解析）
+     * @param request HTTP请求（用于获取token）
      * @return 订单详情
      */
     @GetMapping("/detail")
     public AjaxResult getOrderDetail(@RequestParam String orderType,
-                                     @RequestParam Long id) {
+                                     @RequestParam Long id,
+                                     @RequestParam(required = false) Long userId,
+                                     HttpServletRequest request) {
         try {
+            // 获取用户ID
+            Long currentUserId = getUserId(request, userId);
+            if (currentUserId == null) {
+                return AjaxResult.error("用户未登录");
+            }
+
             // 1. 参数校验
             if (!validateOrderType(orderType)) {
                 return AjaxResult.error("不支持的订单类型");
@@ -288,20 +282,20 @@ public class UnifiedOrderController extends BaseController {
             Object vo;
             switch (orderType) {
                 case ORDER_TYPE_REF:
-                    vo = refereeOrderService.getOrderVOById(id);
+                    vo = refereeOrderService.getOrderVOByUserId(currentUserId, id);
                     break;
                 case ORDER_TYPE_LIVE:
-                    vo = livePersonOrderService.getOrderVOById(id);
+                    vo = livePersonOrderService.getOrderVOByUserId(currentUserId, id);
                     break;
                 case ORDER_TYPE_MALL:
-                    vo = mallOrderService.getOrderVOById(id);
+                    vo = mallOrderService.getOrderVOByUserId(currentUserId, id);
                     break;
                 default:
                     throw new IllegalArgumentException("不支持的订单类型");
             }
 
             if (vo == null) {
-                return AjaxResult.error("订单不存在");
+                return AjaxResult.error("订单不存在或无权限访问");
             }
 
             return AjaxResult.success(vo);
@@ -314,17 +308,27 @@ public class UnifiedOrderController extends BaseController {
     /**
      * 取消订单
      * <p>
-     * 支持三种订单类型的统一取消接口
+     * 支持三种订单类型的统一取消接口，用户只能取消自己的订单
      * </p>
      *
      * @param orderType 订单类型（必填）REF/LIVE/MALL
      * @param id 订单 ID（必填）
+     * @param userId 用户ID（可选，优先从token解析）
+     * @param request HTTP请求（用于获取token）
      * @return 取消结果
      */
     @PostMapping("/cancel")
     public AjaxResult cancelOrder(@RequestParam String orderType,
-                                  @RequestParam Long id) {
+                                  @RequestParam Long id,
+                                  @RequestParam(required = false) Long userId,
+                                  HttpServletRequest request) {
         try {
+            // 获取用户ID
+            Long currentUserId = getUserId(request, userId);
+            if (currentUserId == null) {
+                return AjaxResult.error("用户未登录");
+            }
+
             // 1. 参数校验
             if (!validateOrderType(orderType)) {
                 return AjaxResult.error("不支持的订单类型");
@@ -337,13 +341,13 @@ public class UnifiedOrderController extends BaseController {
             boolean result;
             switch (orderType) {
                 case ORDER_TYPE_REF:
-                    result = refereeOrderService.cancelOrder(id);
+                    result = refereeOrderService.cancelOrderByUserId(currentUserId, id);
                     break;
                 case ORDER_TYPE_LIVE:
-                    result = livePersonOrderService.cancelOrder(id);
+                    result = livePersonOrderService.cancelOrderByUserId(currentUserId, id);
                     break;
                 case ORDER_TYPE_MALL:
-                    result = mallOrderService.cancelOrder(id);
+                    result = mallOrderService.cancelOrderByUserId(currentUserId, id);
                     break;
                 default:
                     result = false;
@@ -376,18 +380,41 @@ public class UnifiedOrderController extends BaseController {
     public TableDataInfo listUnifiedOrders(@RequestParam(required = false) String orderType,
                                           @RequestParam(required = false) Integer status,
                                           @RequestParam(required = false) String orderNo,
-                                          @RequestParam(required = false) String contactName) {
+                                          @RequestParam(required = false) String contactName,
+                                          @RequestParam(required = false) Long userId,
+                                          HttpServletRequest request) {
         try {
+            // 获取用户ID（优先从参数获取，其次从token解析）
+            Long currentUserId = getUserId(request, userId);
+            if (currentUserId == null) {
+                // 用户未登录或未传递userId，返回空列表
+                TableDataInfo rspData = new TableDataInfo();
+                rspData.setCode(401);
+                rspData.setMsg("用户未登录");
+                rspData.setData(new ArrayList<>());
+                rspData.setTotal(0L);
+                return rspData;
+            }
+            
             startPage();
             UnifiedOrderQueryDTO queryDTO = new UnifiedOrderQueryDTO();
             queryDTO.setOrderType(orderType);
             queryDTO.setStatus(status);
             queryDTO.setOrderNo(orderNo);
             queryDTO.setContactName(contactName);
+            queryDTO.setUserId(currentUserId);
             List<UnifiedOrderVO> list = unifiedOrderService.listUnifiedOrders(queryDTO);
+            
+            // 返回分页数据
             return getDataTable(list);
         } catch (Exception e) {
-            return getDataTable(new java.util.ArrayList<>());
+            logger.error("查询统一订单失败", e);
+            TableDataInfo rspData = new TableDataInfo();
+            rspData.setCode(500);
+            rspData.setMsg("查询失败: " + e.getMessage());
+            rspData.setData(new ArrayList<>());
+            rspData.setTotal(0L);
+            return rspData;
         }
     }
 

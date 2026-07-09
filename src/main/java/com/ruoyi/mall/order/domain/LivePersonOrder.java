@@ -29,6 +29,9 @@ public class LivePersonOrder {
      */
     private String orderNo;
 
+    /** 用户ID */
+    private Long userId;
+
     /**
      * 直播人员ID
      */

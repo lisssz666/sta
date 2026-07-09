@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.ruoyi.framework.datasource.DynamicDataSourceContextHolder.log;
+// import static com.ruoyi.framework.datasource.DynamicDataSourceContextHolder.log;
 
 
 @RestController

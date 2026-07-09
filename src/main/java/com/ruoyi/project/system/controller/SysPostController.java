@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -45,16 +44,6 @@ public class SysPostController extends BaseController
         startPage();
         List<SysPost> list = postService.selectPostList(post);
         return getDataTable(list);
-    }
-    
-    @Log(title = "岗位管理", businessType = BusinessType.EXPORT)
-    @PreAuthorize("@ss.hasPermi('system:post:export')")
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, SysPost post)
-    {
-        List<SysPost> list = postService.selectPostList(post);
-        ExcelUtil<SysPost> util = new ExcelUtil<SysPost>(SysPost.class);
-        util.exportExcel(response, list, "岗位数据");
     }
 
     /**

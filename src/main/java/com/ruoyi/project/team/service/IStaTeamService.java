@@ -29,6 +29,14 @@ public interface IStaTeamService
     public List<StaTeam> selectStaTeamList(StaTeam staTeam);
 
     /**
+     * 根据联赛ID查询球队信息
+     * 
+     * @param leagueId 联赛ID
+     * @return 球队信息集合
+     */
+    public List<StaTeam> selectStaTeamByLeagueId(Long leagueId);
+
+    /**
      * 新增球队信息
      * 
      * @param staTeam 球队信息

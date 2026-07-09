@@ -12,7 +12,6 @@ import com.ruoyi.project.match.domain.StaLeagueMatch;
 import com.ruoyi.project.match.service.IStaLeagueMatchService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
 
 /**
@@ -40,17 +39,6 @@ public class StaLeagueMatchController extends BaseController
 //        Integer accessCount = staLeagueMatchService.getAccessCount();
         List<StaLeagueMatch> list = staLeagueMatchService.selectStaLeagueMatchList(staLeagueMatch);
         return getDataTable(list);
-    }
-
-    /**
-     * 导出联赛信息列表
-     */
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, StaLeagueMatch staLeagueMatch)
-    {
-        List<StaLeagueMatch> list = staLeagueMatchService.selectStaLeagueMatchList(staLeagueMatch);
-        ExcelUtil<StaLeagueMatch> util = new ExcelUtil<StaLeagueMatch>(StaLeagueMatch.class);
-        util.exportExcel(response, list, "联赛信息数据");
     }
 
     /**

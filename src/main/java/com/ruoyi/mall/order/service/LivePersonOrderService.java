@@ -84,6 +84,45 @@ public interface LivePersonOrderService {
     List<LivePersonOrderVO> listOrdersNoPage(Long livePersonId, String contactPhone, Integer status);
 
     /**
+     * 根据用户ID查询订单列表
+     *
+     * @param userId 用户ID
+     * @param livePersonId 直播人员ID
+     * @param contactPhone 联系人电话
+     * @param status 订单状态
+     * @return 订单VO列表
+     */
+    List<LivePersonOrderVO> listOrdersByUserId(Long userId, Long livePersonId, String contactPhone, Integer status);
+
+    /**
+     * 根据用户ID和订单ID查询订单VO
+     *
+     * @param userId 用户ID
+     * @param orderId 订单ID
+     * @return 订单VO
+     */
+    LivePersonOrderVO getOrderVOByUserId(Long userId, Long orderId);
+
+    /**
+     * 根据用户ID取消订单
+     *
+     * @param userId 用户ID
+     * @param orderId 订单ID
+     * @return 取消是否成功
+     * @throws Exception 异常
+     */
+    boolean cancelOrderByUserId(Long userId, Long orderId) throws Exception;
+
+    /**
+     * 根据用户ID删除订单
+     *
+     * @param userId 用户ID
+     * @param orderId 订单ID
+     * @return 删除是否成功
+     */
+    boolean removeOrderByUserId(Long userId, Long orderId);
+
+    /**
      * 查询所有订单
      *
      * @return 订单VO列表

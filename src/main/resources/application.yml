@@ -23,7 +23,7 @@ server:
   ssl:
     key-store: classpath:ybyoulan.cn.pfx
     key-store-type: PKCS12
-    key-store-password: fgd6b86sm29
+    key-store-password: 3ro46543n4mb
     key-alias: ybyoulan.cn
   servlet:
     # 应用的访问路径
@@ -53,6 +53,11 @@ spring:
     basename: i18n/messages
   profiles: 
     active: druid
+  datasource:
+    url: jdbc:mysql://114.132.162.213:3306/game_statistics?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: Admin123!
+    driverClassName: com.mysql.cj.jdbc.Driver
   # 文件上传
   servlet:
      multipart:
@@ -184,6 +189,14 @@ gen:
 
 common:
   vipDayRemaining: 30
+
+# 数据库备份配置
+backup:
+  # 备份文件存储路径
+  path: ./backup
+  # 备份保留天数（超过此天数的备份会被自动清理）
+  retention:
+    days: 30
 
 wechat:
   appid: wx6a9f44e2b18a316e

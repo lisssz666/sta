@@ -18,6 +18,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="attendance"   column="attendance"/>
         <result property="timeSlot"   column="time_slot"/>
         <result property="gameOrderCount"   column="game_order_count"/>
+        <result property="verifyCode"   column="verify_code"/>
+        <result property="groupType"   column="group_type"/>
+        <result property="memberCount"   column="member_count"/>
+        <result property="leagueId"   column="league_id"/>
         <result property="createBy"    column="create_by"/>
         <result property="createTime"  column="create_time"/>
         <result property="updateBy"    column="update_by"/>
@@ -25,12 +29,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectStaTeamVo">
-    select id, team_title, team_logo, team_photo, leader_name, leader_phone, city, home_color, away_color, team_introduction, attendance, time_slot, game_order_count, create_by, create_time, update_by, update_time
+    select id, team_title, team_logo, team_photo, leader_name, leader_phone, city, home_color, away_color, team_introduction, attendance, time_slot, game_order_count, verify_code, group_type, 
+           (SELECT COUNT(*) FROM sta_player WHERE team_id = sta_team.id) AS member_count, 
+           league_id, create_by, create_time, update_by, update_time
     from sta_team
 </sql>
 
     <sql id="selectStaTeamListVo">
-    select id, team_title, leader_name, leader_phone, city, home_color, away_color, team_introduction, attendance, time_slot, game_order_count, create_by, create_time, update_by, update_time
+    select id, team_title, leader_name, leader_phone, city, home_color, away_color, team_introduction, attendance, time_slot, game_order_count, verify_code, group_type, 
+           (SELECT COUNT(*) FROM sta_player WHERE team_id = sta_team.id) AS member_count, 
+           league_id, create_by, create_time, update_by, update_time
     from sta_team
 </sql>
 
@@ -40,6 +48,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="teamTitle != null and teamTitle != ''"> and team_title = #{teamTitle}</if>
             <if test="leaderName != null and leaderName != ''"> and leader_name = #{leaderName}</if>
             <if test="city != null and city != ''"> and city = #{city}</if>
+            <if test="groupType != null"> and group_type = #{groupType}</if>
+            <if test="leagueId != null"> and league_id = #{leagueId}</if>
         </where>
         order by create_time desc
     </select>
@@ -64,6 +74,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="attendance != null">attendance,</if>
             <if test="timeSlot != null">time_slot,</if>
             <if test="gameOrderCount != null">game_order_count,</if>
+            <if test="verifyCode != null">verify_code,</if>
+            <if test="groupType != null">group_type,</if>
+            <if test="leagueId != null">league_id,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
@@ -82,6 +95,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="attendance != null">#{attendance},</if>
             <if test="timeSlot != null">#{timeSlot},</if>
             <if test="gameOrderCount != null">#{gameOrderCount},</if>
+            <if test="verifyCode != null">#{verifyCode},</if>
+            <if test="groupType != null">#{groupType},</if>
+            <if test="leagueId != null">#{leagueId},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
@@ -104,6 +120,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="attendance != null">attendance = #{attendance},</if>
             <if test="timeSlot != null">time_slot = #{timeSlot},</if>
             <if test="gameOrderCount != null">game_order_count = #{gameOrderCount},</if>
+            <if test="verifyCode != null">verify_code = #{verifyCode},</if>
+            <if test="groupType != null">group_type = #{groupType},</if>
+            <if test="leagueId != null">league_id = #{leagueId},</if>
         </trim>
         where id = #{id}
     </update>

@@ -52,6 +52,10 @@ public class StaPlayerServiceImpl implements IStaPlayerService
                 .map(player -> {
                     String logoPath = player.getLogoPath();
                     player.setLogoPath(server + "/" + logoPath);
+                    String insurancePath = player.getInsuranceCertificatePath();
+                    if (insurancePath != null && !insurancePath.isEmpty()) {
+                        player.setInsuranceCertificatePath(server + "/" + insurancePath);
+                    }
                     return player;
                 })
                 .orElse(null);
@@ -73,6 +77,10 @@ public class StaPlayerServiceImpl implements IStaPlayerService
                     String logoPath = sta.getLogoPath();
                     logoPath = server + "/" + logoPath;
                     sta.setLogoPath(logoPath);
+                    String insurancePath = sta.getInsuranceCertificatePath();
+                    if (insurancePath != null && !insurancePath.isEmpty()) {
+                        sta.setInsuranceCertificatePath(server + "/" + insurancePath);
+                    }
                 })
                 .collect(Collectors.toList());
     }
@@ -90,10 +98,17 @@ public class StaPlayerServiceImpl implements IStaPlayerService
         System.out.print("球员logo文件 ： "+logo);
         if (logo != null)
         {
-            //上传球员logo
             String path = FileUploadUtils.upload(uploadImgPath, logo);
             staPlayer.setLogoPath(path);
         }
+        
+        MultipartFile insuranceCertificate = staPlayer.getInsuranceCertificate();
+        if (insuranceCertificate != null)
+        {
+            String insurancePath = FileUploadUtils.upload(uploadImgPath, insuranceCertificate);
+            staPlayer.setInsuranceCertificatePath(insurancePath);
+        }
+        
         staPlayerMapper.insertStaPlayer(staPlayer);
         return staPlayer.getId();
     }
@@ -113,6 +128,18 @@ public class StaPlayerServiceImpl implements IStaPlayerService
             staPlayer.setId(i);
         }
         staPlayer.setUpdateTime(DateUtils.getNowDate());
+        
+        MultipartFile insuranceCertificate = staPlayer.getInsuranceCertificate();
+        if (insuranceCertificate != null)
+        {
+            try {
+                String insurancePath = FileUploadUtils.upload(uploadImgPath, insuranceCertificate);
+                staPlayer.setInsuranceCertificatePath(insurancePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
         return staPlayerMapper.updateStaPlayer(staPlayer);
     }
 

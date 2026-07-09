@@ -54,7 +54,8 @@ public class StaTeamServiceImpl implements IStaTeamService
                 .map(staTeam -> {
                     if (staTeam.getTeamLogoPath() != null && !staTeam.getTeamLogoPath().isEmpty()) {
                         staTeam.setTeamLogoPath(server + staTeam.getTeamLogoPath());
-                    }if (staTeam.getTeamPhotoPath() != null && !staTeam.getTeamPhotoPath().isEmpty()) {
+                    }
+                    if (staTeam.getTeamPhotoPath() != null && !staTeam.getTeamPhotoPath().isEmpty()) {
                         staTeam.setTeamPhotoPath(server + staTeam.getTeamPhotoPath());
                     }
                     return staTeam;
@@ -72,15 +73,32 @@ public class StaTeamServiceImpl implements IStaTeamService
     public List<StaTeam> selectStaTeamList(StaTeam staTeam)
     {
         List<StaTeam> staTeams = staTeamMapper.selectStaTeamList(staTeam);
-        // 使用Stream API更新leagueLogoPath
         return staTeams.stream()
                 .peek(sta -> {
-                    String logoPath = sta.getTeamLogoPath();
-                    String photoPath = sta.getTeamPhotoPath();
-                    logoPath = server + logoPath;
-                    photoPath = server + photoPath;
-                    sta.setTeamLogoPath(logoPath);
-                    sta.setTeamPhotoPath(photoPath);
+                    if (sta.getTeamLogoPath() != null && !sta.getTeamLogoPath().isEmpty()) {
+                        sta.setTeamLogoPath(server + sta.getTeamLogoPath());
+                    }
+                    if (sta.getTeamPhotoPath() != null && !sta.getTeamPhotoPath().isEmpty()) {
+                        sta.setTeamPhotoPath(server + sta.getTeamPhotoPath());
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 根据联赛ID查询球队信息
+     */
+    @Override
+    public List<StaTeam> selectStaTeamByLeagueId(Long leagueId) {
+        List<StaTeam> staTeams = staTeamMapper.selectStaTeamByLeagueId(leagueId);
+        return staTeams.stream()
+                .peek(sta -> {
+                    if (sta.getTeamLogoPath() != null && !sta.getTeamLogoPath().isEmpty()) {
+                        sta.setTeamLogoPath(server + sta.getTeamLogoPath());
+                    }
+                    if (sta.getTeamPhotoPath() != null && !sta.getTeamPhotoPath().isEmpty()) {
+                        sta.setTeamPhotoPath(server + sta.getTeamPhotoPath());
+                    }
                 })
                 .collect(Collectors.toList());
     }

@@ -2,8 +2,6 @@ package com.ruoyi.framework.security.service;
 
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.framework.redis.RedisCache;
-import com.ruoyi.project.red.domain.RedCaptcha;
-import com.ruoyi.project.red.service.IRedCaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,8 +12,6 @@ import com.ruoyi.common.exception.user.CaptchaExpireException;
 import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.manager.AsyncManager;
-import com.ruoyi.framework.manager.factory.AsyncFactory;
 //import com.ruoyi.framework.redis.RedisCache;
 import com.ruoyi.framework.security.RegisterBody;
 import com.ruoyi.project.system.domain.SysUser;
@@ -40,9 +36,6 @@ public class SysRegisterService
 
     @Value("${spring.redis.enabled}")
     private boolean enabledRedis;
-
-    @Autowired
-    private IRedCaptchaService redCaptchaService;
 
     @Autowired
     private RedisCache redisCache;
@@ -134,14 +127,6 @@ public class SysRegisterService
         if(enabledRedis) {
             captcha = redisCache.getCacheObject(verifyKey);
             redisCache.deleteObject(verifyKey);
-        }else {
-            RedCaptcha redCaptcha = redCaptchaService.selectRedCaptchaByCaptchaKey(verifyKey);
-            if(null!=redCaptcha) {
-                if (DateUtils.getNowDate().before(redCaptcha.getExpreationTime())) {
-                    captcha = redCaptcha.getCaptchaCode();
-                }
-                redCaptchaService.deleteRedCaptchaByCaptchaId(redCaptcha.getCaptchaId());
-            }
         }
 
         if (captcha == null)
